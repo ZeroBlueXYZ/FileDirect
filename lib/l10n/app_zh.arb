@@ -1,3 +1,5 @@
 {
-  "appName": "AnySend"
+  "appName": "AnySend",
+  "homeNavigationItemSend": "发送",
+  "homeNavigationItemReceive": "接收"
 }

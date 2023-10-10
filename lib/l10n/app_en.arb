@@ -2,5 +2,13 @@
   "appName": "AnySend",
   "@appName": {
     "description": "app name"
+  },
+  "homeNavigationItemSend": "Send",
+  "@homeNavigationItemSend": {
+    "description": "label of the navigation item"
+  },
+  "homeNavigationItemReceive": "Receive",
+  "@homeNavigationItemReceive": {
+    "description": "label of the navigation item"
   }
 }
