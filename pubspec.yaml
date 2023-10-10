@@ -12,13 +12,18 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  http_interceptor: ^1.0.2
   intl: any
+  json_annotation: ^4.8.1
+  web_socket_channel: ^2.4.0
 
 dev_dependencies:
+  build_runner: ^2.4.6
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
   import_sorter: ^4.6.0
+  json_serializable: ^6.7.1
 
 flutter:
   generate: true

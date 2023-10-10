@@ -15,6 +15,10 @@ flutter pub run import_sorter:main
 ```
 flutter gen-l10n
 ```
+- Generate JSON serializable code
+```
+dart run build_runner build --delete-conflicting-outputs
+```
 
 ## References
 - [Material Theme Builder](https://m3.material.io/theme-builder)
