@@ -1,0 +1,6 @@
+{
+  "appName": "AnySend",
+  "@appName": {
+    "description": "app name"
+  }
+}
