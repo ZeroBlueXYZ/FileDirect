@@ -34,14 +34,23 @@ PODS:
     - DKImagePickerController/PhotoGallery
     - Flutter
   - Flutter (1.0.0)
+  - flutter_webrtc (0.9.36):
+    - Flutter
+    - WebRTC-SDK (= 114.5735.08)
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - SDWebImage (5.18.2):
     - SDWebImage/Core (= 5.18.2)
   - SDWebImage/Core (5.18.2)
   - SwiftyGif (5.4.4)
+  - WebRTC-SDK (114.5735.08)
 
 DEPENDENCIES:
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
+  - flutter_webrtc (from `.symlinks/plugins/flutter_webrtc/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -49,20 +58,28 @@ SPEC REPOS:
     - DKPhotoGallery
     - SDWebImage
     - SwiftyGif
+    - WebRTC-SDK
 
 EXTERNAL SOURCES:
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
     :path: Flutter
+  flutter_webrtc:
+    :path: ".symlinks/plugins/flutter_webrtc/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
 
 SPEC CHECKSUMS:
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   file_picker: 63d7a9f5a3b5fe8fa001b1af955065e42a6c7b3e
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_webrtc: 55df3aaa802114dad390191a46c2c8d535751268
+  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   SDWebImage: c0de394d7cf7f9838aed1fd6bb6037654a4572e4
   SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
+  WebRTC-SDK: c24d2a6c9f571f2ed42297cb8ffba9557093142b
 
 PODFILE CHECKSUM: 5f601a72f5d7c7ab616a105eaddc23e45a5c2fb2
 
