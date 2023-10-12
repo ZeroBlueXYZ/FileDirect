@@ -13,6 +13,15 @@
   "textExpiresIn": "Expires in",
   "textWaitForSenderToAccept": "Waiting for sender to accept",
   "textEnterReceiveCodeFromSender": "Enter 6 digit receive code",
+  "textRequestForReceive": "{name}\nrequests to receive data",
+  "@textRequestForReceive": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "#101"
+      }
+    }
+  },
   "warningUnknownError": "Something went wrong",
   "warningRestrictedNetworkError": "Failed to connect to remote peer. Check your firewall settings or use a different network.",
   "warningOngoingTask": "Please wait for the ongoing task to complete first",

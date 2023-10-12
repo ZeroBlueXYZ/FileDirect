@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -5,9 +7,9 @@ import 'package:provider/provider.dart';
 
 import 'package:anysend/model/file.dart';
 import 'package:anysend/model/job_state.dart';
-import 'package:anysend/model/package.dart';
 import 'package:anysend/repository/package.dart';
 import 'package:anysend/util/file_helper.dart';
+import 'package:anysend/util/peer_channel/receive_channel.dart';
 import 'package:anysend/view/widget/action_card.dart';
 import 'package:anysend/view/widget/file_card.dart';
 import 'package:anysend/view/widget/warning.dart';
@@ -21,6 +23,8 @@ class ReceiveScreen extends StatefulWidget {
 
 class _ReceiveScreenState extends State<ReceiveScreen> {
   final PackageRepository _packageRepo = PackageRepository();
+  final ReceiveChannel _receiveChannel = ReceiveChannel();
+  final String _name = "#${Random().nextInt(999).toString().padLeft(3, "0")}";
 
   final List<JobFile> _files = [];
 
@@ -29,10 +33,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   final TextEditingController _codeTextEditingController =
       TextEditingController();
 
-  Package? _package;
-
   int get _totalFileSize =>
       _files.fold(0, (previousValue, file) => previousValue + file.info.size);
+
+  @override
+  void dispose() {
+    _receiveChannel.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,14 +106,45 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                     ScaffoldMessenger.of(context)
                         .showSnackBar(ongoingTaskSnackBar(context));
                   } else {
-                    _package = await _packageRepo.get(
+                    final package = await _packageRepo.get(
                         code: _codeTextEditingController.text);
-                    if (_package == null) {
+                    if (package == null) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context)
                             .showSnackBar(invalidCodeSnackBar(context));
                       }
                     } else {
+                      await _receiveChannel.connect(
+                        peerId: package.ownerId,
+                        onFailure: () {
+                          ScaffoldMessenger.of(parentContext).showSnackBar(
+                              restrictedNetworkErrorSnackBar(parentContext));
+                          state.value = JobState.ready;
+                        },
+                        onCancel: () async {
+                          ScaffoldMessenger.of(parentContext)
+                              .showSnackBar(canceledByPeerSnackBar(
+                            parentContext,
+                            onPressed: () {},
+                          ));
+                          await _receiveChannel.close();
+                          state.value = JobState.ready;
+                        },
+                        onAcceptOrDeny: (accept) async {
+                          if (accept) {
+                            state.value = JobState.receiving;
+                          } else {
+                            ScaffoldMessenger.of(parentContext)
+                                .showSnackBar(deniedBySenderSnackBar(
+                              parentContext,
+                              onPressed: () {},
+                            ));
+                            await _receiveChannel.close();
+                            state.value = JobState.ready;
+                          }
+                        },
+                      );
+                      await _receiveChannel.askToReceive(_name);
                       state.value = JobState.waitingForSenderToAccept;
                     }
                   }
@@ -137,13 +176,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   Widget _waitingStateActionCard(JobStateModel state) {
     return ActionCard(
-      title: const Text("#101", textAlign: TextAlign.center),
+      title: Text(_name, textAlign: TextAlign.center),
       subtitle: Text(
         AppLocalizations.of(context)!.textWaitForSenderToAccept,
         textAlign: TextAlign.center,
       ),
       trailingIcon: Icons.cancel,
-      onTrailingIconPressed: () {
+      onTrailingIconPressed: () async {
+        await _receiveChannel.close();
         state.value = JobState.ready;
       },
     );
@@ -156,7 +196,9 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       subtitle: Text(
           "${_files.length} / $fileCountText\n${_totalFileSize.readableFileSize()} / ${_totalFileSize.readableFileSize()}"),
       trailingIcon: Icons.cancel,
-      onTrailingIconPressed: () {
+      onTrailingIconPressed: () async {
+        _receiveChannel.sendCancelSignal();
+        await _receiveChannel.close();
         state.value = JobState.ready;
       },
       linearProgressIndicator: const LinearProgressIndicator(
@@ -172,7 +214,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       subtitle: Text(
           "${_files.length} / $fileCountText\n${_totalFileSize.readableFileSize()} / ${_totalFileSize.readableFileSize()}"),
       trailingIcon: Icons.done,
-      onTrailingIconPressed: () {
+      onTrailingIconPressed: () async {
+        await _receiveChannel.close();
         setState(() {
           _files.clear();
         });

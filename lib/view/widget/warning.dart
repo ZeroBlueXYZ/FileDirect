@@ -37,7 +37,7 @@ SnackBar deniedBySenderSnackBar(
       label: AppLocalizations.of(context)!.textOk,
       onPressed: onPressed,
     ),
-    duration: const Duration(days: 1),
+    duration: const Duration(seconds: 8),
   );
 }
 

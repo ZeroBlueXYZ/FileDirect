@@ -7,13 +7,13 @@ flutter run
 ```
 
 ## Useful Commands
-- Sort imports
-```
-flutter pub run import_sorter:main
-```
 - Generate localizations
 ```
 flutter gen-l10n
+```
+- Sort imports
+```
+dart run import_sorter:main
 ```
 - Generate JSON serializable code
 ```

@@ -13,6 +13,7 @@ import 'package:anysend/model/job_state.dart';
 import 'package:anysend/model/package.dart';
 import 'package:anysend/repository/package.dart';
 import 'package:anysend/util/file_helper.dart';
+import 'package:anysend/util/peer_channel/send_channel.dart';
 import 'package:anysend/view/widget/action_card.dart';
 import 'package:anysend/view/widget/file_card.dart';
 import 'package:anysend/view/widget/warning.dart';
@@ -26,6 +27,7 @@ class SendScreen extends StatefulWidget {
 
 class _SendScreenState extends State<SendScreen> {
   final PackageRepository _packageRepo = PackageRepository();
+  final SendChannel _sendChannel = SendChannel();
 
   final List<JobFile> _files = [];
 
@@ -70,6 +72,12 @@ class _SendScreenState extends State<SendScreen> {
       }
       setState(() {});
     }
+  }
+
+  @override
+  void dispose() {
+    _sendChannel.close();
+    super.dispose();
   }
 
   @override
@@ -216,6 +224,36 @@ class _SendScreenState extends State<SendScreen> {
                   .showSnackBar(unknownErrorSnackBar(context));
             }
           } else {
+            await _sendChannel.connect(
+              onFailure: () {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(restrictedNetworkErrorSnackBar(context));
+                state.value = JobState.ready;
+              },
+              onCancel: () async {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(canceledByPeerSnackBar(
+                  context,
+                  onPressed: () {},
+                ));
+                await _sendChannel.close();
+                state.value = JobState.ready;
+              },
+              onAskToReceive: (peerId, name) async {
+                if (_sendChannel.peerId != null) {
+                  await _sendChannel.replyToReceive(peerId, false);
+                } else {
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) => ChangeNotifierProvider.value(
+                      value: state,
+                      child: _acceptOrDenyDialog(peerId, name),
+                    ),
+                  );
+                }
+              },
+            );
             state.value = JobState.waitingForReceiverToConnect;
           }
         }
@@ -241,14 +279,16 @@ class _SendScreenState extends State<SendScreen> {
             format: CountDownTimerFormat.minutesSeconds,
             enableDescriptions: false,
             spacerWidth: 2,
-            onEnd: () {
+            onEnd: () async {
+              await _sendChannel.close();
               state.value = JobState.ready;
             },
           ),
         ],
       ),
       trailingIcon: Icons.cancel,
-      onTrailingIconPressed: () {
+      onTrailingIconPressed: () async {
+        await _sendChannel.close();
         state.value = JobState.ready;
       },
     );
@@ -261,7 +301,9 @@ class _SendScreenState extends State<SendScreen> {
       subtitle: Text(
           "${_files.length} / $fileCountText\n${_totalFileSize.readableFileSize()} / ${_totalFileSize.readableFileSize()}"),
       trailingIcon: Icons.cancel,
-      onTrailingIconPressed: () {
+      onTrailingIconPressed: () async {
+        _sendChannel.sendCancelSignal();
+        await _sendChannel.close();
         state.value = JobState.ready;
       },
       linearProgressIndicator: const LinearProgressIndicator(
@@ -277,7 +319,8 @@ class _SendScreenState extends State<SendScreen> {
       subtitle: Text(
           "${_files.length} / $fileCountText\n${_totalFileSize.readableFileSize()} / ${_totalFileSize.readableFileSize()}"),
       trailingIcon: state.value == JobState.sending ? Icons.cancel : Icons.done,
-      onTrailingIconPressed: () {
+      onTrailingIconPressed: () async {
+        await _sendChannel.close();
         setState(() {
           _files.clear();
         });
@@ -285,6 +328,44 @@ class _SendScreenState extends State<SendScreen> {
       },
       linearProgressIndicator: const LinearProgressIndicator(
         value: 1.0,
+      ),
+    );
+  }
+
+  Widget _acceptOrDenyDialog(String peerId, String name) {
+    return Consumer<JobStateModel>(
+      builder: (context, state, child) => AlertDialog(
+        title: Text(
+          AppLocalizations.of(context)!.textRequestForReceive(name),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await _sendChannel.replyToReceive(peerId, false);
+              if (mounted) {
+                Navigator.pop(context, "deny");
+              }
+            },
+            child: Text(
+              AppLocalizations.of(context)!.textDeny,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              await _sendChannel.replyToReceive(peerId, true);
+              if (mounted) {
+                Navigator.pop(context, "accept");
+              }
+              state.value = JobState.sending;
+            },
+            child: Text(
+              AppLocalizations.of(context)!.textAccept,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
       ),
     );
   }
