@@ -1,14 +1,31 @@
 {
   "appName": "AnySend",
-  "@appName": {
-    "description": "app name"
-  },
-  "homeNavigationItemSend": "Send",
-  "@homeNavigationItemSend": {
-    "description": "label of the navigation item"
-  },
-  "homeNavigationItemReceive": "Receive",
-  "@homeNavigationItemReceive": {
-    "description": "label of the navigation item"
+  "textSend": "Send",
+  "textReceive": "Receive",
+  "textOk": "OK",
+  "textAccept": "Accept",
+  "textDeny": "Deny",
+  "textFile": "File",
+  "textFolder": "Folder",
+  "textImage": "Image",
+  "textVideo": "Video",
+  "textDeleteAll": "Delete All",
+  "textExpiresIn": "Expires in",
+  "textWaitForSenderToAccept": "Waiting for sender to accept",
+  "textEnterReceiveCodeFromSender": "Enter 6 digit receive code",
+  "warningUnknownError": "Something went wrong",
+  "warningRestrictedNetworkError": "Failed to connect to remote peer. Check your firewall settings or use a different network.",
+  "warningOngoingTask": "Please wait for the ongoing task to complete first",
+  "warningInvalidCode": "Invalid code",
+  "warningDeniedBySender": "Sender denied transfer request",
+  "warningCanceledByPeer": "Peer canceled the transfer",
+  "fileCount": "{count, plural, =0{0 File} =1{1 File} other{{count} Files}}",
+  "@fileCount": {
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
   }
 }

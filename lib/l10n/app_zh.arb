@@ -1,5 +1,23 @@
 {
   "appName": "AnySend",
-  "homeNavigationItemSend": "发送",
-  "homeNavigationItemReceive": "接收"
+  "textSend": "发送",
+  "textReceive": "接收",
+  "textOk": "好的",
+  "textAccept": "同意",
+  "textDeny": "拒绝",
+  "textFile": "文件",
+  "textFolder": "文件夹",
+  "textImage": "照片",
+  "textVideo": "视频",
+  "textDeleteAll": "全部删除",
+  "textExpiresIn": "到期",
+  "textWaitForSenderToAccept": "Waiting for sender to accept",
+  "textEnterReceiveCodeFromSender": "输入6位数字接收代码",
+  "warningUnknownError": "出了一些问题",
+  "warningRestrictedNetworkError": "和另一方建立连接失败。请检查您的防火墙设置或使用不同的网络。",
+  "warningOngoingTask": "请先等待进行中的任务完成",
+  "warningInvalidCode": "无效代码",
+  "warningDeniedBySender": "发送方拒绝了传输请求",
+  "warningCanceledByPeer": "另一方取消了传输",
+  "fileCount": "{count, plural, =0{0 个文件} =1{1 个文件} other{{count} 个文件}}"
 }

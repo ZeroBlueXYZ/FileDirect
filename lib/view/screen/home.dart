@@ -61,12 +61,12 @@ class _HomeScreenState extends State<HomeScreen> {
         NavigationRailDestination(
           icon: const Icon(Icons.upload_outlined),
           selectedIcon: const Icon(Icons.upload),
-          label: Text(AppLocalizations.of(context)!.homeNavigationItemSend),
+          label: Text(AppLocalizations.of(context)!.textSend),
         ),
         NavigationRailDestination(
           icon: const Icon(Icons.download_outlined),
           selectedIcon: const Icon(Icons.download),
-          label: Text(AppLocalizations.of(context)!.homeNavigationItemReceive),
+          label: Text(AppLocalizations.of(context)!.textReceive),
         ),
       ],
       labelType: NavigationRailLabelType.all,
@@ -85,12 +85,12 @@ class _HomeScreenState extends State<HomeScreen> {
         BottomNavigationBarItem(
           icon: const Icon(Icons.upload_outlined),
           activeIcon: const Icon(Icons.upload),
-          label: AppLocalizations.of(context)!.homeNavigationItemSend,
+          label: AppLocalizations.of(context)!.textSend,
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.download_outlined),
           activeIcon: const Icon(Icons.download),
-          label: AppLocalizations.of(context)!.homeNavigationItemReceive,
+          label: AppLocalizations.of(context)!.textReceive,
         ),
       ],
       currentIndex: _navigationItemIndex,

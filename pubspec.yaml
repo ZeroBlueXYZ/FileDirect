@@ -8,13 +8,16 @@ environment:
 
 dependencies:
   cupertino_icons: ^1.0.2
+  file_picker: ^5.5.0
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  flutter_timer_countdown: ^1.0.5
   http_interceptor: ^1.0.2
   intl: any
   json_annotation: ^4.8.1
+  path: ^1.8.3
   provider: ^6.0.5
   web_socket_channel: ^2.4.0
 
