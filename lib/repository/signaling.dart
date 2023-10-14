@@ -18,28 +18,17 @@ class SignalingRepository extends BaseRepository {
     _channel.sink.add(jsonEncode(wsAuthToken.toJson()));
   }
 
-  void receive(
-    void Function(Signal)? onData, {
-    Function? onError,
-    void Function()? onDone,
-    bool? cancelOnError,
-  }) {
-    _channel.stream.listen(
-      (dynamic data) {
-        final signal = Signal.fromJson(jsonDecode(data));
-        onData?.call(signal);
-      },
-      onError: onError,
-      onDone: onDone,
-      cancelOnError: cancelOnError,
-    );
+  Stream<Signal> receive() async* {
+    await for (final data in _channel.stream) {
+      yield Signal.fromJson(jsonDecode(data));
+    }
+  }
+
+  Future<dynamic> closeReceive() async {
+    return await _channel.sink.close();
   }
 
   void send(Signal signal) {
     _channel.sink.add(jsonEncode(signal.toJson()));
-  }
-
-  Future<dynamic> close() async {
-    return await _channel.sink.close();
   }
 }

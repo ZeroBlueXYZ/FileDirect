@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -7,11 +9,13 @@ import 'package:provider/provider.dart';
 
 import 'package:anysend/model/file.dart';
 import 'package:anysend/model/job_state.dart';
+import 'package:anysend/model/package.dart';
 import 'package:anysend/repository/package.dart';
 import 'package:anysend/util/file_helper.dart';
 import 'package:anysend/util/peer_channel/receive_channel.dart';
 import 'package:anysend/view/widget/action_card.dart';
 import 'package:anysend/view/widget/file_card.dart';
+import 'package:anysend/view/widget/nearby_card.dart';
 import 'package:anysend/view/widget/warning.dart';
 
 class ReceiveScreen extends StatefulWidget {
@@ -22,11 +26,15 @@ class ReceiveScreen extends StatefulWidget {
 }
 
 class _ReceiveScreenState extends State<ReceiveScreen> {
+  static const Duration announceTtl = Duration(seconds: 5);
+
   final PackageRepository _packageRepo = PackageRepository();
   final ReceiveChannel _receiveChannel = ReceiveChannel();
   final String _name = "#${Random().nextInt(999).toString().padLeft(3, "0")}";
 
   final List<JobFile> _files = [];
+  final HashMap<NearbyPackage, DateTime> _nearbyPackages = HashMap();
+  late final Timer _cleanNearbyPackagesTimer;
 
   final GlobalKey<FormState> _codeFormKey = GlobalKey<FormState>();
 
@@ -36,8 +44,76 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   int get _totalFileSize =>
       _files.fold(0, (previousValue, file) => previousValue + file.info.size);
 
+  void _updateNearbyCodes() async {
+    _cleanNearbyPackagesTimer =
+        Timer.periodic(const Duration(seconds: 1), (timer) {
+      _nearbyPackages.removeWhere((package, expireTime) =>
+          expireTime.isBefore(DateTime.now()) ||
+          package.expireTime.isBefore(DateTime.now()));
+      setState(() {});
+    });
+    _packageRepo.receive((nearbyPackage) {
+      _nearbyPackages[nearbyPackage] = DateTime.now().add(announceTtl);
+    });
+  }
+
+  Future<void> _startReceive(
+    BuildContext parentContext,
+    JobStateModel state,
+    String code,
+  ) async {
+    final package = await _packageRepo.get(code: code);
+    if (package == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(invalidCodeSnackBar(context));
+      }
+    } else {
+      await _receiveChannel.connect(
+        peerId: package.ownerId,
+        onFailure: () {
+          ScaffoldMessenger.of(parentContext)
+              .showSnackBar(restrictedNetworkErrorSnackBar(parentContext));
+          state.value = JobState.ready;
+        },
+        onCancel: () async {
+          ScaffoldMessenger.of(parentContext)
+              .showSnackBar(canceledByPeerSnackBar(
+            parentContext,
+            onPressed: () {},
+          ));
+          await _receiveChannel.close();
+          state.value = JobState.ready;
+        },
+        onAcceptOrDeny: (accept) async {
+          if (accept) {
+            state.value = JobState.receiving;
+          } else {
+            ScaffoldMessenger.of(parentContext)
+                .showSnackBar(deniedBySenderSnackBar(
+              parentContext,
+              onPressed: () {},
+            ));
+            await _receiveChannel.close();
+            state.value = JobState.ready;
+          }
+        },
+      );
+      await _receiveChannel.askToReceive(_name);
+      state.value = JobState.waitingForSenderToAccept;
+    }
+  }
+
+  @override
+  void initState() {
+    _updateNearbyCodes();
+    super.initState();
+  }
+
   @override
   void dispose() {
+    _cleanNearbyPackagesTimer.cancel();
+    _packageRepo.closeReceive();
     _receiveChannel.close();
     super.dispose();
   }
@@ -52,8 +128,104 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                 Expanded(child: _fileList()),
                 _actionCard(),
               ])
-            : _codeForm(context),
+            : _readyStateWidget(context),
       ),
+    );
+  }
+
+  Widget _readyStateWidget(BuildContext parentContext) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            AppLocalizations.of(context)!.textCode,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        _codeForm(parentContext),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            AppLocalizations.of(context)!.textNearby,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        Expanded(child: _nearbyList(parentContext)),
+      ],
+    );
+  }
+
+  Widget _codeForm(BuildContext parentContext) {
+    return Container(
+      alignment: AlignmentDirectional.center,
+      child: Consumer<JobStateModel>(
+        builder: (context, state, child) => Form(
+          key: _codeFormKey,
+          child: ListTile(
+            title: TextFormField(
+              controller: _codeTextEditingController,
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(32))),
+                hintText: AppLocalizations.of(context)!
+                    .textEnterReceiveCodeFromSender,
+                errorStyle: const TextStyle(fontSize: 0),
+              ),
+              textAlign: TextAlign.center,
+              validator: (value) =>
+                  value != null && RegExp(r"^\d{6}$").hasMatch(value)
+                      ? null
+                      : "",
+            ),
+            trailing: IconButton.filledTonal(
+              icon: const Icon(Icons.arrow_forward, size: 28),
+              onPressed: () async {
+                if (_codeFormKey.currentState != null &&
+                    _codeFormKey.currentState!.validate()) {
+                  if (state.isSend) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(ongoingTaskSnackBar(context));
+                  } else {
+                    await _startReceive(
+                      parentContext,
+                      state,
+                      _codeTextEditingController.text,
+                    );
+                  }
+                }
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  ListView _nearbyList(BuildContext parentContext) {
+    final nearbyPackages = _nearbyPackages.entries.toList();
+    nearbyPackages.sort((a, b) => a.key.code.compareTo(b.key.code));
+    return ListView.separated(
+      itemBuilder: (context, index) => Consumer<JobStateModel>(
+        builder: (context, state, child) => NearbyCard(
+          package: nearbyPackages[index].key,
+          onTap: () async {
+            await _startReceive(
+              parentContext,
+              state,
+              nearbyPackages[index].key.code,
+            );
+          },
+        ),
+      ),
+      separatorBuilder: (context, index) {
+        return const Divider(
+          height: 2,
+          color: Colors.transparent,
+        );
+      },
+      itemCount: nearbyPackages.length,
     );
   }
 
@@ -73,87 +245,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         );
       },
       itemCount: _files.length,
-    );
-  }
-
-  Widget _codeForm(BuildContext parentContext) {
-    return Container(
-      alignment: AlignmentDirectional.center,
-      child: Consumer<JobStateModel>(
-        builder: (context, state, child) => Form(
-          key: _codeFormKey,
-          child: ListTile(
-            title: TextFormField(
-              controller: _codeTextEditingController,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                hintText: AppLocalizations.of(context)!
-                    .textEnterReceiveCodeFromSender,
-                errorStyle: const TextStyle(fontSize: 0),
-              ),
-              textAlign: TextAlign.center,
-              validator: (value) =>
-                  value != null && RegExp(r"^\d{6}$").hasMatch(value)
-                      ? null
-                      : "",
-            ),
-            trailing: IconButton(
-              icon: const Icon(Icons.arrow_forward),
-              onPressed: () async {
-                if (_codeFormKey.currentState != null &&
-                    _codeFormKey.currentState!.validate()) {
-                  if (state.isSend) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(ongoingTaskSnackBar(context));
-                  } else {
-                    final package = await _packageRepo.get(
-                        code: _codeTextEditingController.text);
-                    if (package == null) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(invalidCodeSnackBar(context));
-                      }
-                    } else {
-                      await _receiveChannel.connect(
-                        peerId: package.ownerId,
-                        onFailure: () {
-                          ScaffoldMessenger.of(parentContext).showSnackBar(
-                              restrictedNetworkErrorSnackBar(parentContext));
-                          state.value = JobState.ready;
-                        },
-                        onCancel: () async {
-                          ScaffoldMessenger.of(parentContext)
-                              .showSnackBar(canceledByPeerSnackBar(
-                            parentContext,
-                            onPressed: () {},
-                          ));
-                          await _receiveChannel.close();
-                          state.value = JobState.ready;
-                        },
-                        onAcceptOrDeny: (accept) async {
-                          if (accept) {
-                            state.value = JobState.receiving;
-                          } else {
-                            ScaffoldMessenger.of(parentContext)
-                                .showSnackBar(deniedBySenderSnackBar(
-                              parentContext,
-                              onPressed: () {},
-                            ));
-                            await _receiveChannel.close();
-                            state.value = JobState.ready;
-                          }
-                        },
-                      );
-                      await _receiveChannel.askToReceive(_name);
-                      state.value = JobState.waitingForSenderToAccept;
-                    }
-                  }
-                }
-              },
-            ),
-          ),
-        ),
-      ),
     );
   }
 

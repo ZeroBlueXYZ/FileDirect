@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -26,12 +27,15 @@ class SendScreen extends StatefulWidget {
 }
 
 class _SendScreenState extends State<SendScreen> {
+  static const Duration announcePeriod = Duration(seconds: 2);
+
   final PackageRepository _packageRepo = PackageRepository();
   final SendChannel _sendChannel = SendChannel();
 
   final List<JobFile> _files = [];
 
   Package? _package;
+  Timer? _announceTimer;
 
   int get _totalFileSize =>
       _files.fold(0, (previousValue, file) => previousValue + file.info.size);
@@ -74,8 +78,59 @@ class _SendScreenState extends State<SendScreen> {
     }
   }
 
+  Future<void> _startSend(JobStateModel state) async {
+    if (state.isReceive) {
+      ScaffoldMessenger.of(context).showSnackBar(ongoingTaskSnackBar(context));
+    } else {
+      _package = await _packageRepo.create();
+      if (_package == null) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(unknownErrorSnackBar(context));
+        }
+      } else {
+        await _sendChannel.connect(
+          onFailure: () {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(restrictedNetworkErrorSnackBar(context));
+            state.value = JobState.ready;
+          },
+          onCancel: () async {
+            ScaffoldMessenger.of(context).showSnackBar(canceledByPeerSnackBar(
+              context,
+              onPressed: () {},
+            ));
+            await _sendChannel.close();
+            state.value = JobState.ready;
+          },
+          onAskToReceive: (peerId, name) async {
+            if (_sendChannel.peerId != null) {
+              await _sendChannel.replyToReceive(peerId, false);
+            } else {
+              showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (context) => ChangeNotifierProvider.value(
+                  value: state,
+                  child: _acceptOrDenyDialog(peerId, name),
+                ),
+              );
+            }
+          },
+        );
+        final code = _package!.code;
+        final expireTime = _package!.expireTime;
+        _announceTimer = Timer.periodic(announcePeriod, (timer) {
+          _packageRepo.send(code: code, expireTime: expireTime);
+        });
+        state.value = JobState.waitingForReceiverToConnect;
+      }
+    }
+  }
+
   @override
   void dispose() {
+    _packageRepo.closeSend();
     _sendChannel.close();
     super.dispose();
   }
@@ -213,50 +268,7 @@ class _SendScreenState extends State<SendScreen> {
       subtitle: Text("$fileCountText\n${_totalFileSize.readableFileSize()}"),
       trailingIcon: Icons.send,
       onTrailingIconPressed: () async {
-        if (state.isReceive) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(ongoingTaskSnackBar(context));
-        } else {
-          _package = await _packageRepo.create();
-          if (_package == null) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(unknownErrorSnackBar(context));
-            }
-          } else {
-            await _sendChannel.connect(
-              onFailure: () {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(restrictedNetworkErrorSnackBar(context));
-                state.value = JobState.ready;
-              },
-              onCancel: () async {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(canceledByPeerSnackBar(
-                  context,
-                  onPressed: () {},
-                ));
-                await _sendChannel.close();
-                state.value = JobState.ready;
-              },
-              onAskToReceive: (peerId, name) async {
-                if (_sendChannel.peerId != null) {
-                  await _sendChannel.replyToReceive(peerId, false);
-                } else {
-                  showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (context) => ChangeNotifierProvider.value(
-                      value: state,
-                      child: _acceptOrDenyDialog(peerId, name),
-                    ),
-                  );
-                }
-              },
-            );
-            state.value = JobState.waitingForReceiverToConnect;
-          }
-        }
+        await _startSend(state);
       },
     );
   }
@@ -280,6 +292,7 @@ class _SendScreenState extends State<SendScreen> {
             enableDescriptions: false,
             spacerWidth: 2,
             onEnd: () async {
+              _announceTimer?.cancel();
               await _sendChannel.close();
               state.value = JobState.ready;
             },
@@ -288,6 +301,7 @@ class _SendScreenState extends State<SendScreen> {
       ),
       trailingIcon: Icons.cancel,
       onTrailingIconPressed: () async {
+        _announceTimer?.cancel();
         await _sendChannel.close();
         state.value = JobState.ready;
       },
@@ -355,6 +369,7 @@ class _SendScreenState extends State<SendScreen> {
           TextButton(
             onPressed: () async {
               await _sendChannel.replyToReceive(peerId, true);
+              _announceTimer?.cancel();
               if (mounted) {
                 Navigator.pop(context, "accept");
               }

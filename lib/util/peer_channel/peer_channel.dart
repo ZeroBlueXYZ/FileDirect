@@ -43,12 +43,12 @@ abstract class PeerChannel {
     }
     this.peerId = peerId;
     _signalingRepository = SignalingRepository();
-    _signalingRepository!.receive(
-      handleSignal,
-      onError: onSignalError,
-      onDone: onSignalDone,
-      cancelOnError: cancelOnSignalError,
-    );
+    _signalingRepository!.receive().listen(
+          handleSignal,
+          onError: onSignalError,
+          onDone: onSignalDone,
+          cancelOnError: cancelOnSignalError,
+        );
     this.onFailure = onFailure;
     this.onClosed = onClosed;
     this.onDone = onDone;
@@ -62,7 +62,7 @@ abstract class PeerChannel {
     onCancel = null;
     await closeDataChannel();
     await closeRtcPeerConnection();
-    await _signalingRepository?.close();
+    await _signalingRepository?.closeReceive();
     _signalingRepository = null;
     peerId = null;
   }
