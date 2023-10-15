@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'package:anysend/model/file.dart';
@@ -26,27 +28,28 @@ class ReceiveScreen extends StatefulWidget {
 }
 
 class _ReceiveScreenState extends State<ReceiveScreen> {
+  static const Duration announcePeriod = Duration(seconds: 2);
   static const Duration announceTtl = Duration(seconds: 5);
+  static const Duration progressPeriod = Duration(milliseconds: 500);
 
   final PackageRepository _packageRepo = PackageRepository();
   final ReceiveChannel _receiveChannel = ReceiveChannel();
   final String _name = "#${Random().nextInt(999).toString().padLeft(3, "0")}";
 
-  final List<JobFile> _files = [];
   final HashMap<NearbyPackage, DateTime> _nearbyPackages = HashMap();
-  late final Timer _cleanNearbyPackagesTimer;
 
   final GlobalKey<FormState> _codeFormKey = GlobalKey<FormState>();
 
   final TextEditingController _codeTextEditingController =
       TextEditingController();
 
-  int get _totalFileSize =>
-      _files.fold(0, (previousValue, file) => previousValue + file.info.size);
+  List<JobFile> get _files => _receiveChannel.files;
 
-  void _updateNearbyCodes() async {
-    _cleanNearbyPackagesTimer =
-        Timer.periodic(const Duration(seconds: 1), (timer) {
+  Timer? _announceTimer;
+  Timer? _progressTimer;
+
+  void _refreshAnnounce() {
+    _announceTimer ??= Timer.periodic(announcePeriod, (timer) {
       _nearbyPackages.removeWhere((package, expireTime) =>
           expireTime.isBefore(DateTime.now()) ||
           package.expireTime.isBefore(DateTime.now()));
@@ -62,6 +65,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     JobStateModel state,
     String code,
   ) async {
+    _files.clear();
+
     final package = await _packageRepo.get(code: code);
     if (package == null) {
       if (context.mounted) {
@@ -71,10 +76,17 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     } else {
       await _receiveChannel.connect(
         peerId: package.ownerId,
-        onFailure: () {
+        onFailure: () async {
           ScaffoldMessenger.of(parentContext)
               .showSnackBar(restrictedNetworkErrorSnackBar(parentContext));
+          await _receiveChannel.close();
+          _progressTimer?.cancel();
           state.value = JobState.ready;
+        },
+        onDone: () async {
+          await _receiveChannel.close();
+          _progressTimer?.cancel();
+          state.value = JobState.received;
         },
         onCancel: () async {
           ScaffoldMessenger.of(parentContext)
@@ -83,10 +95,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             onPressed: () {},
           ));
           await _receiveChannel.close();
+          _progressTimer?.cancel();
           state.value = JobState.ready;
         },
         onAcceptOrDeny: (accept) async {
           if (accept) {
+            _progressTimer = Timer.periodic(progressPeriod, (timer) {
+              setState(() {});
+            });
             state.value = JobState.receiving;
           } else {
             ScaffoldMessenger.of(parentContext)
@@ -99,6 +115,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           }
         },
       );
+      Directory directory = await getTemporaryDirectory();
+      _receiveChannel.outputDirectory = directory.path;
       await _receiveChannel.askToReceive(_name);
       state.value = JobState.waitingForSenderToAccept;
     }
@@ -106,13 +124,13 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   @override
   void initState() {
-    _updateNearbyCodes();
+    _refreshAnnounce();
     super.initState();
   }
 
   @override
   void dispose() {
-    _cleanNearbyPackagesTimer.cancel();
+    _announceTimer?.cancel();
     _packageRepo.closeReceive();
     _receiveChannel.close();
     super.dispose();
@@ -235,6 +253,9 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         builder: (context, state, child) {
           return FileCard(
             fileInfo: _files[index].info,
+            linearProgressIndicator: state.value == JobState.receiving
+                ? LinearProgressIndicator(value: _files[index].writeProgress)
+                : null,
           );
         },
       ),
@@ -285,15 +306,16 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         AppLocalizations.of(context)!.fileCount(_files.length);
     return ActionCard(
       subtitle: Text(
-          "${_files.length} / $fileCountText\n${_totalFileSize.readableFileSize()} / ${_totalFileSize.readableFileSize()}"),
+          "${_receiveChannel.receivedFileCount} / $fileCountText\n${_receiveChannel.receivedFileSize.readableFileSize()} / ${_receiveChannel.totalFileSize.readableFileSize()}"),
       trailingIcon: Icons.cancel,
       onTrailingIconPressed: () async {
         _receiveChannel.sendCancelSignal();
         await _receiveChannel.close();
+        _progressTimer?.cancel();
         state.value = JobState.ready;
       },
-      linearProgressIndicator: const LinearProgressIndicator(
-        value: 1.0,
+      linearProgressIndicator: LinearProgressIndicator(
+        value: _receiveChannel.receiveProgress,
       ),
     );
   }
@@ -303,7 +325,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         AppLocalizations.of(context)!.fileCount(_files.length);
     return ActionCard(
       subtitle: Text(
-          "${_files.length} / $fileCountText\n${_totalFileSize.readableFileSize()} / ${_totalFileSize.readableFileSize()}"),
+          "${_receiveChannel.receivedFileCount} / $fileCountText\n${_receiveChannel.receivedFileSize.readableFileSize()} / ${_receiveChannel.totalFileSize.readableFileSize()}"),
       trailingIcon: Icons.done,
       onTrailingIconPressed: () async {
         await _receiveChannel.close();
@@ -312,8 +334,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         });
         state.value = JobState.ready;
       },
-      linearProgressIndicator: const LinearProgressIndicator(
-        value: 1.0,
+      linearProgressIndicator: LinearProgressIndicator(
+        value: _receiveChannel.receiveProgress,
       ),
     );
   }

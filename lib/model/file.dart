@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'file.g.dart';
@@ -26,9 +29,43 @@ class FileInfo {
 
 class JobFile {
   final FileInfo info;
-  int offset = 0;
+  IOSink? ioSink;
+  int _writeOffset = 0;
+  int requestedOffset = 0;
+  int readSizeInBytes = 0;
 
   JobFile({required this.info});
 
-  double get progress => info.size == 0 ? 1.0 : offset / info.size;
+  int get writeOffset => _writeOffset;
+  double get writeProgress => info.size == 0 ? 1.0 : _writeOffset / info.size;
+
+  IOSink openWrite() {
+    if (ioSink == null) {
+      _writeOffset = 0;
+      ioSink = File(info.path!).openWrite();
+    }
+
+    return ioSink!;
+  }
+
+  void write(Uint8List data) {
+    ioSink!.add(data);
+    _writeOffset += data.lengthInBytes;
+  }
+
+  Future<void> closeWrite() async {
+    await ioSink?.close();
+  }
+}
+
+class FileChunk {
+  int fileId;
+  int offset;
+  Uint8List data;
+
+  FileChunk({
+    required this.fileId,
+    required this.offset,
+    required this.data,
+  });
 }

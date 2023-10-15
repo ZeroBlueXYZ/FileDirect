@@ -28,17 +28,16 @@ class SendScreen extends StatefulWidget {
 
 class _SendScreenState extends State<SendScreen> {
   static const Duration announcePeriod = Duration(seconds: 2);
+  static const Duration progressPeriod = Duration(milliseconds: 500);
 
   final PackageRepository _packageRepo = PackageRepository();
   final SendChannel _sendChannel = SendChannel();
 
-  final List<JobFile> _files = [];
+  List<JobFile> get _files => _sendChannel.files;
 
   Package? _package;
   Timer? _announceTimer;
-
-  int get _totalFileSize =>
-      _files.fold(0, (previousValue, file) => previousValue + file.info.size);
+  Timer? _progressTimer;
 
   void _pickFiles({FileType type = FileType.any}) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -79,6 +78,10 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   Future<void> _startSend(JobStateModel state) async {
+    for (JobFile file in _files) {
+      file.readSizeInBytes = 0;
+    }
+
     if (state.isReceive) {
       ScaffoldMessenger.of(context).showSnackBar(ongoingTaskSnackBar(context));
     } else {
@@ -90,10 +93,17 @@ class _SendScreenState extends State<SendScreen> {
         }
       } else {
         await _sendChannel.connect(
-          onFailure: () {
+          onFailure: () async {
             ScaffoldMessenger.of(context)
                 .showSnackBar(restrictedNetworkErrorSnackBar(context));
+            await _sendChannel.close();
+            _progressTimer?.cancel();
             state.value = JobState.ready;
+          },
+          onDone: () async {
+            await _sendChannel.close();
+            _progressTimer?.cancel();
+            state.value = JobState.sent;
           },
           onCancel: () async {
             ScaffoldMessenger.of(context).showSnackBar(canceledByPeerSnackBar(
@@ -101,6 +111,7 @@ class _SendScreenState extends State<SendScreen> {
               onPressed: () {},
             ));
             await _sendChannel.close();
+            _progressTimer?.cancel();
             state.value = JobState.ready;
           },
           onAskToReceive: (peerId, name) async {
@@ -265,7 +276,8 @@ class _SendScreenState extends State<SendScreen> {
     final fileCountText =
         AppLocalizations.of(context)!.fileCount(_files.length);
     return ActionCard(
-      subtitle: Text("$fileCountText\n${_totalFileSize.readableFileSize()}"),
+      subtitle: Text(
+          "$fileCountText\n${_sendChannel.totalFileSize.readableFileSize()}"),
       trailingIcon: Icons.send,
       onTrailingIconPressed: () async {
         await _startSend(state);
@@ -313,15 +325,16 @@ class _SendScreenState extends State<SendScreen> {
         AppLocalizations.of(context)!.fileCount(_files.length);
     return ActionCard(
       subtitle: Text(
-          "${_files.length} / $fileCountText\n${_totalFileSize.readableFileSize()} / ${_totalFileSize.readableFileSize()}"),
+          "${_sendChannel.sentFileCount} / $fileCountText\n${_sendChannel.sentFileSize.readableFileSize()} / ${_sendChannel.totalFileSize.readableFileSize()}"),
       trailingIcon: Icons.cancel,
       onTrailingIconPressed: () async {
         _sendChannel.sendCancelSignal();
         await _sendChannel.close();
+        _progressTimer?.cancel();
         state.value = JobState.ready;
       },
-      linearProgressIndicator: const LinearProgressIndicator(
-        value: 1.0,
+      linearProgressIndicator: LinearProgressIndicator(
+        value: _sendChannel.sentProgress,
       ),
     );
   }
@@ -331,7 +344,7 @@ class _SendScreenState extends State<SendScreen> {
         AppLocalizations.of(context)!.fileCount(_files.length);
     return ActionCard(
       subtitle: Text(
-          "${_files.length} / $fileCountText\n${_totalFileSize.readableFileSize()} / ${_totalFileSize.readableFileSize()}"),
+          "${_sendChannel.sentFileCount} / $fileCountText\n${_sendChannel.sentFileSize.readableFileSize()} / ${_sendChannel.totalFileSize.readableFileSize()}"),
       trailingIcon: state.value == JobState.sending ? Icons.cancel : Icons.done,
       onTrailingIconPressed: () async {
         await _sendChannel.close();
@@ -340,8 +353,8 @@ class _SendScreenState extends State<SendScreen> {
         });
         state.value = JobState.ready;
       },
-      linearProgressIndicator: const LinearProgressIndicator(
-        value: 1.0,
+      linearProgressIndicator: LinearProgressIndicator(
+        value: _sendChannel.sentProgress,
       ),
     );
   }
@@ -373,6 +386,9 @@ class _SendScreenState extends State<SendScreen> {
               if (mounted) {
                 Navigator.pop(context, "accept");
               }
+              _progressTimer = Timer.periodic(progressPeriod, (timer) {
+                setState(() {});
+              });
               state.value = JobState.sending;
             },
             child: Text(
