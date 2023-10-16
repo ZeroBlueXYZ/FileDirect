@@ -350,7 +350,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         AppLocalizations.of(context)!.fileCount(_files.length);
     return ActionCard(
       subtitle: Text(
-          "${_receiveChannel.receivedFileCount} / $fileCountText\n${_receiveChannel.receivedFileSize.readableFileSize()} / ${_receiveChannel.totalFileSize.readableFileSize()}"),
+          "${_receiveChannel.receivedFileCount} / $fileCountText\n${_receiveChannel.receivedFileSize.readableFileSize()} / ${_receiveChannel.totalFileSize.readableFileSize()}\n${_receiveChannel.speedInBytes.readableFileSize()}/s (${_receiveChannel.remainingTime})"),
       trailingIcon: Icons.cancel,
       onTrailingIconPressed: () async {
         _receiveChannel.sendCancelSignal();

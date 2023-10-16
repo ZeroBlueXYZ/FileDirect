@@ -9,6 +9,8 @@ import 'package:anysend/model/data_signal.dart';
 import 'package:anysend/model/file.dart';
 import 'package:anysend/model/signal.dart';
 import 'package:anysend/util/peer_channel/peer_channel.dart';
+import 'package:anysend/util/time_helper.dart';
+import 'package:anysend/util/timeout_window.dart';
 
 class ReceiveChannel extends PeerChannel {
   static const int maxChunkSizeInBytes = 8 * 1024;
@@ -21,6 +23,9 @@ class ReceiveChannel extends PeerChannel {
 
   final HeapPriorityQueue<FileChunk> _buffer = HeapPriorityQueue((a, b) =>
       a.fileId == b.fileId ? a.offset - b.offset : a.fileId - b.fileId);
+
+  final TimeoutWindow _timeoutWindow = TimeoutWindow();
+  double get speedInBytes => _timeoutWindow.mean();
 
   final List<JobFile> _files = [];
   List<JobFile> get files => _files;
@@ -35,6 +40,9 @@ class ReceiveChannel extends PeerChannel {
       _files.fold(0, (previousValue, file) => previousValue + file.writeOffset);
   double get receiveProgress =>
       totalFileSize == 0 ? 0 : receivedFileSize / totalFileSize;
+  String get remainingTime => speedInBytes == 0
+      ? "∞"
+      : ((totalFileSize - receivedFileSize) ~/ speedInBytes).readableDuration();
 
   String? outputDirectory;
   void Function(bool)? onAcceptOrDeny;
@@ -131,6 +139,7 @@ class ReceiveChannel extends PeerChannel {
     }
 
     Uint8List data = bytes.sublist(16);
+    _timeoutWindow.add(data.lengthInBytes.toDouble());
     _write(FileChunk(fileId: fileId, offset: start, data: data));
   }
 

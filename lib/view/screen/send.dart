@@ -325,7 +325,7 @@ class _SendScreenState extends State<SendScreen> {
         AppLocalizations.of(context)!.fileCount(_files.length);
     return ActionCard(
       subtitle: Text(
-          "${_sendChannel.sentFileCount} / $fileCountText\n${_sendChannel.sentFileSize.readableFileSize()} / ${_sendChannel.totalFileSize.readableFileSize()}"),
+          "${_sendChannel.sentFileCount} / $fileCountText\n${_sendChannel.sentFileSize.readableFileSize()} / ${_sendChannel.totalFileSize.readableFileSize()}\n${_sendChannel.speedInBytes.readableFileSize()}/s (${_sendChannel.remainingTime})"),
       trailingIcon: Icons.cancel,
       onTrailingIconPressed: () async {
         _sendChannel.sendCancelSignal();

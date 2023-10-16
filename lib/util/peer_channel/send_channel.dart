@@ -9,10 +9,15 @@ import 'package:anysend/model/data_signal.dart';
 import 'package:anysend/model/file.dart';
 import 'package:anysend/model/signal.dart';
 import 'package:anysend/util/peer_channel/peer_channel.dart';
+import 'package:anysend/util/time_helper.dart';
+import 'package:anysend/util/timeout_window.dart';
 
 class SendChannel extends PeerChannel {
   static const int maxChunkSizeInBytes = 16 * 1024 - 16;
   static const int pageSizeInFiles = 100;
+
+  final TimeoutWindow _timeoutWindow = TimeoutWindow();
+  double get speedInBytes => _timeoutWindow.mean();
 
   final List<JobFile> _files = [];
   List<JobFile> get files => _files;
@@ -27,6 +32,9 @@ class SendChannel extends PeerChannel {
       0, (previousValue, file) => previousValue + file.readSizeInBytes);
   double get sentProgress =>
       totalFileSize == 0 ? 0 : sentFileSize / totalFileSize;
+  String get remainingTime => speedInBytes == 0
+      ? "∞"
+      : ((totalFileSize - sentFileSize) ~/ speedInBytes).readableDuration();
 
   void Function(String, String)? onAskToReceive;
 
@@ -155,6 +163,7 @@ class SendChannel extends PeerChannel {
       return;
     }
 
+    _timeoutWindow.add((req.end - req.start).toDouble());
     ChunkedStreamReader<int> reader = ChunkedStreamReader(
         (File(file.info.path!).openRead(req.start, req.end)));
     try {
