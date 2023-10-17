@@ -8,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'package:anysend/model/file.dart';
 import 'package:anysend/model/job_state.dart';
@@ -92,16 +93,19 @@ class _SendScreenState extends State<SendScreen> {
               .showSnackBar(unknownErrorSnackBar(context));
         }
       } else {
+        await WakelockPlus.enable();
         await _sendChannel.connect(
           onFailure: () async {
             ScaffoldMessenger.of(context)
                 .showSnackBar(restrictedNetworkErrorSnackBar(context));
             await _sendChannel.close();
+            await WakelockPlus.disable();
             _progressTimer?.cancel();
             state.value = JobState.ready;
           },
           onDone: () async {
             await _sendChannel.close();
+            await WakelockPlus.disable();
             _progressTimer?.cancel();
             state.value = JobState.sent;
           },
@@ -111,6 +115,7 @@ class _SendScreenState extends State<SendScreen> {
               onPressed: () {},
             ));
             await _sendChannel.close();
+            await WakelockPlus.disable();
             _progressTimer?.cancel();
             state.value = JobState.ready;
           },
@@ -141,6 +146,7 @@ class _SendScreenState extends State<SendScreen> {
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     _packageRepo.closeSend();
     _sendChannel.close();
     super.dispose();
@@ -306,6 +312,7 @@ class _SendScreenState extends State<SendScreen> {
             onEnd: () async {
               _announceTimer?.cancel();
               await _sendChannel.close();
+              await WakelockPlus.disable();
               state.value = JobState.ready;
             },
           ),
@@ -315,6 +322,7 @@ class _SendScreenState extends State<SendScreen> {
       onTrailingIconPressed: () async {
         _announceTimer?.cancel();
         await _sendChannel.close();
+        await WakelockPlus.disable();
         state.value = JobState.ready;
       },
     );
@@ -330,6 +338,7 @@ class _SendScreenState extends State<SendScreen> {
       onTrailingIconPressed: () async {
         _sendChannel.sendCancelSignal();
         await _sendChannel.close();
+        await WakelockPlus.disable();
         _progressTimer?.cancel();
         state.value = JobState.ready;
       },
@@ -348,6 +357,7 @@ class _SendScreenState extends State<SendScreen> {
       trailingIcon: state.value == JobState.sending ? Icons.cancel : Icons.done,
       onTrailingIconPressed: () async {
         await _sendChannel.close();
+        await WakelockPlus.disable();
         setState(() {
           _files.clear();
         });

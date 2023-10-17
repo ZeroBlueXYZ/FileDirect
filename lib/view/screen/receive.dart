@@ -9,6 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'package:anysend/model/file.dart';
 import 'package:anysend/model/job_state.dart';
@@ -120,17 +121,20 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             .showSnackBar(invalidCodeSnackBar(context));
       }
     } else {
+      await WakelockPlus.enable();
       await _receiveChannel.connect(
         peerId: package.ownerId,
         onFailure: () async {
           ScaffoldMessenger.of(parentContext)
               .showSnackBar(restrictedNetworkErrorSnackBar(parentContext));
           await _receiveChannel.close();
+          await WakelockPlus.disable();
           _progressTimer?.cancel();
           state.value = JobState.ready;
         },
         onDone: () async {
           await _receiveChannel.close();
+          await WakelockPlus.disable();
           _progressTimer?.cancel();
           state.value = JobState.received;
         },
@@ -141,6 +145,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             onPressed: () {},
           ));
           await _receiveChannel.close();
+          await WakelockPlus.disable();
           _progressTimer?.cancel();
           state.value = JobState.ready;
         },
@@ -157,6 +162,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
               onPressed: () {},
             ));
             await _receiveChannel.close();
+            await WakelockPlus.disable();
             state.value = JobState.ready;
           }
         },
@@ -174,6 +180,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     _announceTimer?.cancel();
     _packageRepo.closeReceive();
     _receiveChannel.close();
@@ -340,6 +347,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       trailingIcon: Icons.cancel,
       onTrailingIconPressed: () async {
         await _receiveChannel.close();
+        await WakelockPlus.disable();
         state.value = JobState.ready;
       },
     );
@@ -355,6 +363,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       onTrailingIconPressed: () async {
         _receiveChannel.sendCancelSignal();
         await _receiveChannel.close();
+        await WakelockPlus.disable();
         _progressTimer?.cancel();
         state.value = JobState.ready;
       },
@@ -373,6 +382,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       trailingIcon: Icons.done,
       onTrailingIconPressed: () async {
         await _receiveChannel.close();
+        await WakelockPlus.disable();
         setState(() {
           _files.clear();
         });
