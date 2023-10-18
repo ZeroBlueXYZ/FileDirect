@@ -335,13 +335,24 @@ class _SendScreenState extends State<SendScreen> {
       subtitle: Text(
           "${_sendChannel.sentFileCount} / $fileCountText\n${_sendChannel.sentFileSize.readableFileSize()} / ${_sendChannel.totalFileSize.readableFileSize()}\n${_sendChannel.speedInBytes.readableFileSize()}/s (${_sendChannel.remainingTime})"),
       trailingIcon: Icons.cancel,
-      onTrailingIconPressed: () async {
-        _sendChannel.sendCancelSignal();
-        await _sendChannel.close();
-        await WakelockPlus.disable();
-        _progressTimer?.cancel();
-        state.value = JobState.ready;
-      },
+      onTrailingIconPressed: () => showDialog(
+        context: context,
+        builder: (context) =>
+            confirmCancellationDialog(context, onPressed: (canceled) async {
+          if (canceled) {
+            _sendChannel.sendCancelSignal();
+            await _sendChannel.close();
+            await WakelockPlus.disable();
+            _progressTimer?.cancel();
+          }
+          if (mounted) {
+            Navigator.pop(context, canceled ? "canceled" : "not_canceled");
+          }
+          if (canceled) {
+            state.value = JobState.ready;
+          }
+        }),
+      ),
       linearProgressIndicator: LinearProgressIndicator(
         value: _sendChannel.sentProgress,
       ),

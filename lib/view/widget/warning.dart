@@ -54,3 +54,31 @@ SnackBar canceledByPeerSnackBar(
     duration: const Duration(days: 1),
   );
 }
+
+Widget confirmCancellationDialog(
+  BuildContext context, {
+  required void Function(bool) onPressed,
+}) {
+  return AlertDialog(
+    title: Text(
+      AppLocalizations.of(context)!.textConfirmCancel,
+      textAlign: TextAlign.center,
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => onPressed(false),
+        child: Text(
+          AppLocalizations.of(context)!.textNo,
+          textAlign: TextAlign.center,
+        ),
+      ),
+      TextButton(
+        onPressed: () => onPressed(true),
+        child: Text(
+          AppLocalizations.of(context)!.textYes,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    ],
+  );
+}

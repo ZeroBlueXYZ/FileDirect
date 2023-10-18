@@ -360,13 +360,22 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       subtitle: Text(
           "${_receiveChannel.receivedFileCount} / $fileCountText\n${_receiveChannel.receivedFileSize.readableFileSize()} / ${_receiveChannel.totalFileSize.readableFileSize()}\n${_receiveChannel.speedInBytes.readableFileSize()}/s (${_receiveChannel.remainingTime})"),
       trailingIcon: Icons.cancel,
-      onTrailingIconPressed: () async {
-        _receiveChannel.sendCancelSignal();
-        await _receiveChannel.close();
-        await WakelockPlus.disable();
-        _progressTimer?.cancel();
-        state.value = JobState.ready;
-      },
+      onTrailingIconPressed: () => showDialog(
+        context: context,
+        builder: (context) =>
+            confirmCancellationDialog(context, onPressed: (canceled) async {
+          if (canceled) {
+            _receiveChannel.sendCancelSignal();
+            await _receiveChannel.close();
+            await WakelockPlus.disable();
+            _progressTimer?.cancel();
+            state.value = JobState.ready;
+          }
+          if (mounted) {
+            Navigator.pop(context, canceled ? "canceled" : "not_canceled");
+          }
+        }),
+      ),
       linearProgressIndicator: LinearProgressIndicator(
         value: _receiveChannel.receiveProgress,
       ),
