@@ -14,6 +14,36 @@ abstract class PeerChannel {
       {
         "url": "stun:stun.l.google.com:19302",
       },
+      {
+        "url": "stun:stun.ekiga.net:3478",
+      },
+      {
+        "url": "stun:stun.ideasip.com:3478",
+      },
+      {
+        "url": "stun:stun.iptel.org:3478",
+      },
+      {
+        "url": "stun:stun.rixtelecom.se:3478",
+      },
+      {
+        "url": "stun:stun.schlund.de:3478",
+      },
+      {
+        "url": "stun:stunserver.org:3478",
+      },
+      {
+        "url": "stun:stun.softjoys.com:3478",
+      },
+      {
+        "url": "stun:stun.voiparound.com:3478",
+      },
+      {
+        "url": "stun:stun.voipbuster.com:3478",
+      },
+      {
+        "url": "stun:stun.voipstunt.com:3478",
+      },
     ],
   };
 
