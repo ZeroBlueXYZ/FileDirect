@@ -21,6 +21,7 @@
   "textRequestForReceive": "{name}\n请求接收数据",
   "warningUnknownError": "出了一些问题",
   "warningRestrictedNetworkError": "和另一方建立连接失败。请检查您的防火墙设置或使用不同的网络。",
+  "warningInterruptedNetworkError": "和另一方的连接中断",
   "warningOngoingTask": "请先等待进行中的任务完成",
   "warningInvalidCode": "代码不存在",
   "warningDeniedBySender": "发送方拒绝了传输请求",

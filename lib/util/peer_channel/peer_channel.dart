@@ -50,8 +50,9 @@ abstract class PeerChannel {
   SignalingRepository? _signalingRepository;
   RTCPeerConnection? _peerConnection;
   RTCDataChannel? _dataChannel;
+  bool _wasConnected = false;
 
-  void Function()? onFailure;
+  void Function(bool)? onFailure;
   void Function()? onClosed;
   void Function()? onDone;
   void Function()? onCancel;
@@ -63,7 +64,7 @@ abstract class PeerChannel {
     Function? onSignalError,
     void Function()? onSignalDone,
     bool? cancelOnSignalError,
-    void Function()? onFailure,
+    void Function(bool)? onFailure,
     void Function()? onClosed,
     void Function()? onDone,
     void Function()? onCancel,
@@ -95,6 +96,7 @@ abstract class PeerChannel {
     await _signalingRepository?.closeReceive();
     _signalingRepository = null;
     peerId = null;
+    _wasConnected = false;
   }
 
   void sendSignal({
@@ -179,8 +181,10 @@ abstract class PeerChannel {
 
     _peerConnection!.onIceConnectionState = (state) {
       switch (state) {
+        case RTCIceConnectionState.RTCIceConnectionStateConnected:
+          _wasConnected = true;
         case RTCIceConnectionState.RTCIceConnectionStateFailed:
-          onFailure?.call();
+          onFailure?.call(_wasConnected);
         case RTCIceConnectionState.RTCIceConnectionStateClosed:
           onClosed?.call();
         default:

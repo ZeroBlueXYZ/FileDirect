@@ -53,7 +53,7 @@ class ReceiveChannel extends PeerChannel {
     Function? onSignalError,
     void Function()? onSignalDone,
     bool? cancelOnSignalError,
-    void Function()? onFailure,
+    void Function(bool)? onFailure,
     void Function()? onClosed,
     void Function()? onDone,
     void Function()? onCancel,

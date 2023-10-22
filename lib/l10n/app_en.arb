@@ -29,6 +29,7 @@
   },
   "warningUnknownError": "Something went wrong",
   "warningRestrictedNetworkError": "Failed to connect to remote peer. Check your firewall settings or use a different network.",
+  "warningInterruptedNetworkError": "Peer connection was interrupted",
   "warningOngoingTask": "Please wait for the ongoing task to complete first",
   "warningInvalidCode": "Code doesn't exist",
   "warningDeniedBySender": "Sender denied transfer request",

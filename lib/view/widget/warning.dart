@@ -8,10 +8,31 @@ SnackBar unknownErrorSnackBar(BuildContext context) {
   );
 }
 
-SnackBar restrictedNetworkErrorSnackBar(BuildContext context) {
+SnackBar restrictedNetworkErrorSnackBar(
+  BuildContext context, {
+  required void Function() onPressed,
+}) {
   return SnackBar(
     content: Text(AppLocalizations.of(context)!.warningRestrictedNetworkError),
-    duration: const Duration(seconds: 8),
+    action: SnackBarAction(
+      label: AppLocalizations.of(context)!.textOk,
+      onPressed: onPressed,
+    ),
+    duration: const Duration(days: 1),
+  );
+}
+
+SnackBar interruptedNetworkErrorSnackBar(
+  BuildContext context, {
+  required void Function() onPressed,
+}) {
+  return SnackBar(
+    content: Text(AppLocalizations.of(context)!.warningInterruptedNetworkError),
+    action: SnackBarAction(
+      label: AppLocalizations.of(context)!.textOk,
+      onPressed: onPressed,
+    ),
+    duration: const Duration(days: 1),
   );
 }
 

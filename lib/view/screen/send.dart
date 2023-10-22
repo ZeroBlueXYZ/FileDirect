@@ -95,9 +95,10 @@ class _SendScreenState extends State<SendScreen> {
       } else {
         await WakelockPlus.enable();
         await _sendChannel.connect(
-          onFailure: () async {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(restrictedNetworkErrorSnackBar(context));
+          onFailure: (wasConnected) async {
+            ScaffoldMessenger.of(context).showSnackBar(wasConnected
+                ? interruptedNetworkErrorSnackBar(context, onPressed: () {})
+                : restrictedNetworkErrorSnackBar(context, onPressed: () {}));
             await _sendChannel.close();
             await WakelockPlus.disable();
             _progressTimer?.cancel();

@@ -124,9 +124,11 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       await WakelockPlus.enable();
       await _receiveChannel.connect(
         peerId: package.ownerId,
-        onFailure: () async {
-          ScaffoldMessenger.of(parentContext)
-              .showSnackBar(restrictedNetworkErrorSnackBar(parentContext));
+        onFailure: (wasConnected) async {
+          ScaffoldMessenger.of(parentContext).showSnackBar(wasConnected
+              ? interruptedNetworkErrorSnackBar(parentContext, onPressed: () {})
+              : restrictedNetworkErrorSnackBar(parentContext,
+                  onPressed: () {}));
           await _receiveChannel.close();
           await WakelockPlus.disable();
           _progressTimer?.cancel();
