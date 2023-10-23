@@ -13,5 +13,5 @@ BUNDLE_DIR=./build/linux/x64/release/bundle/
 mkdir -p $DEBUG_INFO_DIR
 flutter build linux --obfuscate --split-debug-info=$DEBUG_INFO_DIR
 pushd $BUNDLE_DIR
-zip -r ../anysend.zip *
+zip -r "../anysend-$VERSION.zip" *
 popd
