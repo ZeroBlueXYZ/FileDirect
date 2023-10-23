@@ -10,6 +10,7 @@ class FileCard extends StatelessWidget {
   final IconData? trailingIcon;
   final void Function()? onTrailingIconPressed;
   final LinearProgressIndicator? linearProgressIndicator;
+  final bool showPreview;
 
   const FileCard({
     super.key,
@@ -17,6 +18,7 @@ class FileCard extends StatelessWidget {
     this.trailingIcon,
     this.onTrailingIconPressed,
     this.linearProgressIndicator,
+    this.showPreview = false,
   });
 
   @override
@@ -42,10 +44,14 @@ class FileCard extends StatelessWidget {
 
   Widget _leading() {
     if (fileInfo.name.isImage()) {
-      return Image.file(
-        File(fileInfo.path!),
-        errorBuilder: (context, error, stackTrace) => const Icon(Icons.image),
-      );
+      if (showPreview) {
+        return Image.file(
+          File(fileInfo.path!),
+          errorBuilder: (context, error, stackTrace) => const Icon(Icons.image),
+        );
+      } else {
+        return const Icon(Icons.image);
+      }
     } else if (fileInfo.name.isVideo()) {
       return const Icon(Icons.video_file);
     } else {

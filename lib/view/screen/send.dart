@@ -251,6 +251,7 @@ class _SendScreenState extends State<SendScreen> {
                 _files.removeAt(index);
               });
             },
+            showPreview: true,
           );
         },
       ),
