@@ -1,13 +1,18 @@
 #!/bin/bash
 set -e
 
-VERSION="$1"
-if ! [ -n "$VERSION" ]; then
-    echo "Version cannot be empty"
+BUILD_NAME="$1"
+BUILD_NUMBER="$2"
+if ! { [ -n "$BUILD_NAME" ] && [ -n "$BUILD_NUMBER" ]; }; then
+    echo "Both build name and build number must be specified"
     exit 1
 fi
 
-DEBUG_INFO_DIR=./debug_info/$VERSION/macos
+DEBUG_INFO_DIR=./debug_info/$BUILD_NAME+$BUILD_NUMBER/macos
 
 mkdir -p $DEBUG_INFO_DIR
-flutter build macos --obfuscate --split-debug-info=$DEBUG_INFO_DIR
+flutter build macos \
+    --obfuscate \
+    --split-debug-info=$DEBUG_INFO_DIR \
+    --build-name=$BUILD_NAME \
+    --build-number=$BUILD_NUMBER
