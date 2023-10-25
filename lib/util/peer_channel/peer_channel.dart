@@ -35,15 +35,6 @@ abstract class PeerChannel {
       {
         "url": "stun:stun.softjoys.com:3478",
       },
-      {
-        "url": "stun:stun.voiparound.com:3478",
-      },
-      {
-        "url": "stun:stun.voipbuster.com:3478",
-      },
-      {
-        "url": "stun:stun.voipstunt.com:3478",
-      },
     ],
   };
 
