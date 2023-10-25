@@ -196,6 +196,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       child: Consumer<JobStateModel>(
         builder: (context, state, child) => state.isReceive
             ? Column(children: [
+                if (state.value == JobState.received) _fileLocationButton(),
                 Expanded(child: _fileList()),
                 _actionCard(),
               ])
@@ -297,6 +298,30 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         );
       },
       itemCount: nearbyPackages.length,
+    );
+  }
+
+  TextButton _fileLocationButton() {
+    return TextButton(
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: Text(
+                AppLocalizations.of(context)!.textReceviedFileLocationAnswer),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(AppLocalizations.of(context)!.textOk),
+              ),
+            ],
+          ),
+        );
+      },
+      child:
+          Text(AppLocalizations.of(context)!.textReceviedFileLocationQuestion),
     );
   }
 

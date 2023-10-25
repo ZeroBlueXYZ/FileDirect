@@ -18,6 +18,8 @@
   "textEnterReceiveCodeFromSender": "输入6位数字分享码",
   "textCode": "代码",
   "textNearby": "附近的",
+  "textReceviedFileLocationQuestion": "收到的文件在哪里？",
+  "textReceviedFileLocationAnswer": "在 IOS 上，收到的文件存在应用文件夹中。在其他平台上，收到的文件存在下载文件夹中。",
   "textRequestForReceive": "{name}\n请求接收数据",
   "warningUnknownError": "出了未知问题。",
   "warningRestrictedNetworkError": "和另一方建立连接失败。请检查您的防火墙设置或使用不同的网络。",
