@@ -34,7 +34,7 @@ class PackageRepository extends BaseRepository {
     return null;
   }
 
-  void receive(void Function(NearbyPackage)? onData) async {
+  Future<void> receive(void Function(NearbyPackage)? onData) async {
     if (_receiveSocket != null) {
       throw "already listening to multicast";
     }

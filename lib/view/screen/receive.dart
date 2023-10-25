@@ -52,16 +52,18 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   Timer? _announceTimer;
   Timer? _progressTimer;
 
-  void _refreshAnnounce() {
+  Future<void> _refreshAnnounce() async {
     _announceTimer ??= Timer.periodic(announcePeriod, (timer) {
       _nearbyPackages.removeWhere((package, expireTime) =>
           expireTime.isBefore(DateTime.now()) ||
           package.expireTime.isBefore(DateTime.now()));
       setState(() {});
     });
-    _packageRepo.receive((nearbyPackage) {
-      _nearbyPackages[nearbyPackage] = DateTime.now().add(announceTtl);
-    });
+    try {
+      await _packageRepo.receive((nearbyPackage) {
+        _nearbyPackages[nearbyPackage] = DateTime.now().add(announceTtl);
+      });
+    } catch (_) {}
   }
 
   Future<Directory?> _getOutputDirectory() async {
