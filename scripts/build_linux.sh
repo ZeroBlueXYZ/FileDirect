@@ -18,5 +18,5 @@ flutter build linux \
     --build-name=$BUILD_NAME \
     --build-number=$BUILD_NUMBER
 pushd $BUNDLE_DIR
-zip -r "../anysend-$VERSION.zip" *
+zip -r "../anysend-$BUILD_NAME+$BUILD_NUMBER.zip" *
 popd
