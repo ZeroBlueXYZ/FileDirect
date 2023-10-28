@@ -67,11 +67,7 @@ Uri? _savedDirectory() {
 }
 
 Future<Uri?> _getIosOutputDirectory() async {
-  final Directory? directory = await getDownloadsDirectory();
-  if (directory == null) {
-    return null;
-  }
-
+  final Directory directory = await getApplicationDocumentsDirectory();
   if (!directory.existsSync()) {
     try {
       directory.createSync();
