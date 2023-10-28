@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -16,6 +13,7 @@ import 'package:anysend/model/job_state.dart';
 import 'package:anysend/model/package.dart';
 import 'package:anysend/repository/package.dart';
 import 'package:anysend/util/file_helper.dart';
+import 'package:anysend/util/output_path_helper.dart';
 import 'package:anysend/util/peer_channel/receive_channel.dart';
 import 'package:anysend/view/widget/action_card.dart';
 import 'package:anysend/view/widget/file_card.dart';
@@ -30,8 +28,6 @@ class ReceiveScreen extends StatefulWidget {
 }
 
 class _ReceiveScreenState extends State<ReceiveScreen> {
-  static const String androidDownloadDirectoryPath =
-      "/storage/emulated/0/Download/";
   static const Duration announcePeriod = Duration(seconds: 2);
   static const Duration announceTtl = Duration(seconds: 5);
   static const Duration progressPeriod = Duration(milliseconds: 500);
@@ -66,54 +62,17 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     } catch (_) {}
   }
 
-  Future<Directory?> _getOutputDirectory() async {
-    if (Platform.isAndroid) {
-      PermissionStatus status =
-          await Permission.manageExternalStorage.request();
-      if (!status.isGranted) {
-        if (status.isPermanentlyDenied) {
-          openAppSettings();
-        }
-        return null;
-      }
-    }
-
-    Directory? directory;
-    if (Platform.isAndroid) {
-      directory = Directory(androidDownloadDirectoryPath);
-    } else if (Platform.isIOS) {
-      directory = await getApplicationDocumentsDirectory();
-    } else {
-      directory = await getDownloadsDirectory();
-    }
-
-    if (directory != null) {
-      if (directory.existsSync()) {
-        return directory;
-      }
-
-      try {
-        directory.createSync();
-        return directory;
-      } catch (_) {}
-    }
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(unknownErrorSnackBar(context));
-    }
-    return null;
-  }
-
   Future<void> _startReceive(
     BuildContext parentContext,
     JobStateModel state,
     String code,
   ) async {
-    Directory? directory = await _getOutputDirectory();
+    Uri? directory = await getOutputDirectory();
     if (directory == null) {
       return;
     }
-    _receiveChannel.outputDirectory = directory.path;
+    debugPrint(directory.toString());
+    _receiveChannel.outputDirectory = directory;
     _files.clear();
 
     final package = await _packageRepo.get(code: code);

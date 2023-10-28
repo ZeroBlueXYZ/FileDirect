@@ -3,7 +3,6 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:path/path.dart' as path;
 
 import 'package:anysend/model/data_signal.dart';
 import 'package:anysend/model/file.dart';
@@ -44,7 +43,7 @@ class ReceiveChannel extends PeerChannel {
       ? "∞"
       : ((totalFileSize - receivedFileSize) ~/ speedInBytes).readableDuration();
 
-  String? outputDirectory;
+  Uri? outputDirectory;
   void Function(bool)? onAcceptOrDeny;
 
   @override
@@ -152,7 +151,7 @@ class ReceiveChannel extends PeerChannel {
       if (chunk.offset > file.writeOffset) {
         break;
       } else if (chunk.offset == file.writeOffset) {
-        file.write(_buffer.removeFirst().data);
+        await file.write(_buffer.removeFirst().data);
 
         if (file.requestedOffset < file.info.size &&
             file.writeOffset % maxBatchSizeInBytes == 0) {
@@ -165,7 +164,7 @@ class ReceiveChannel extends PeerChannel {
           int nextFileId = chunk.fileId + 1;
           if (nextFileId < _files.length) {
             JobFile nextFile = _files[nextFileId];
-            nextFile.openWrite();
+            await nextFile.openWrite();
             nextFile.requestedOffset =
                 min(nextFile.info.size, maxBufferSizeInBytes);
             await _sendGetChunk(nextFileId, 0, nextFile.requestedOffset);
@@ -207,12 +206,17 @@ class ReceiveChannel extends PeerChannel {
 
   Future<void> _handleFilesList(ListFilesResponse resp) async {
     for (FileInfo file in resp.files) {
-      _files.add(JobFile(
-        info: FileInfo(
-          name: file.name,
-          size: file.size,
-          path: path.join(outputDirectory!, file.name),
-        ),
+      // _files.add(JobFile(
+      //   info: FileInfo(
+      //     name: file.name,
+      //     size: file.size,
+      //     path: path.join(outputDirectory!, file.name),
+      //   ),
+      // ));
+      _files.add(JobFile.inDirectory(
+        directoryUri: outputDirectory!,
+        name: file.name,
+        size: file.size,
       ));
     }
 
@@ -221,7 +225,7 @@ class ReceiveChannel extends PeerChannel {
     } else {
       if (_files.isNotEmpty) {
         JobFile file = _files[0];
-        file.openWrite();
+        await file.openWrite();
         file.requestedOffset = min(file.info.size, maxBufferSizeInBytes);
         await _sendGetChunk(0, 0, file.requestedOffset);
       }

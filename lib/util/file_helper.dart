@@ -38,6 +38,10 @@ extension FileExtension on String? {
     "wmv",
   ];
 
+  static const List<String> _textExtensions = [
+    "txt",
+  ];
+
   bool isImage() {
     return this != null &&
         _imageExtensions.any((name) => this!.endsWith(".$name"));
@@ -46,5 +50,22 @@ extension FileExtension on String? {
   bool isVideo() {
     return this != null &&
         _videoExtensions.any((name) => this!.endsWith(".$name"));
+  }
+
+  bool isText() {
+    return this != null &&
+        _textExtensions.any((name) => this!.endsWith(".$name"));
+  }
+
+  String mimeType() {
+    if (isImage()) {
+      return "image";
+    } else if (isVideo()) {
+      return "video";
+    } else if (isText()) {
+      return "text";
+    } else {
+      return "application";
+    }
   }
 }
