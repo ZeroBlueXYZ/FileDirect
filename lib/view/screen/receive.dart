@@ -226,7 +226,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                           context: context,
                           builder: (context) => ChangeNotifierProvider.value(
                             value: state,
-                            child: _storagePermissionDialog(parentContext),
+                            child: _storagePermissionDialog(
+                              parentContext,
+                              _codeTextEditingController.text,
+                            ),
                           ),
                         );
                       },
@@ -259,7 +262,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                   context: context,
                   builder: (context) => ChangeNotifierProvider.value(
                     value: state,
-                    child: _storagePermissionDialog(parentContext),
+                    child: _storagePermissionDialog(
+                      parentContext,
+                      nearbyPackages[index].key.code,
+                    ),
                   ),
                 );
               },
@@ -410,10 +416,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     );
   }
 
-  Widget _storagePermissionDialog(BuildContext parentContext) {
+  Widget _storagePermissionDialog(BuildContext parentContext, String code) {
     return Consumer<JobStateModel>(
       builder: (context, state, child) => AlertDialog(
-        content: Text(
+        title: Text(
           AppLocalizations.of(context)!.textRequestForStoragePermission,
         ),
         actions: [
@@ -423,7 +429,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
               await _startReceive(
                 parentContext,
                 state,
-                _codeTextEditingController.text,
+                code,
               );
             },
             child: Text(

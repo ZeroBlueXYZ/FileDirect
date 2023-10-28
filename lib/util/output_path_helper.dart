@@ -3,23 +3,25 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_storage/shared_storage.dart' as saf;
 
-const String kAppFolder = "AnySend";
-const String kAndroidDocumentsDirectoryUri =
-    "content://com.android.externalstorage.documents/tree/primary%3ADocuments";
+import 'package:anysend/repository/custom_config.dart';
 
 Future<void> needStoragePermission({
   void Function()? onYes,
   void Function()? onNo,
 }) async {
   if (Platform.isAndroid) {
-    Uri downloadDirectoryUri = Uri.parse(kAndroidDocumentsDirectoryUri);
-    final bool? canWrite = await saf.canWrite(downloadDirectoryUri);
-    if (canWrite == null || !canWrite) {
-      onYes?.call();
-      return;
+    Uri? savedDirectoryUri = _savedDirectory();
+    if (savedDirectoryUri != null) {
+      final bool? canWrite = await saf.canWrite(savedDirectoryUri);
+      if (canWrite != null && canWrite) {
+        onNo?.call();
+        return;
+      }
     }
+    onYes?.call();
+  } else {
+    onNo?.call();
   }
-  onNo?.call();
 }
 
 Future<Uri?> getOutputDirectory() async {
@@ -37,29 +39,31 @@ Future<Uri?> getOutputDirectory() async {
 }
 
 Future<Uri?> _getAndroidOutputDirectory() async {
-  Uri downloadDirectoryUri = Uri.parse(kAndroidDocumentsDirectoryUri);
-  final bool? canWrite = await saf.canWrite(downloadDirectoryUri);
-  if (canWrite == null || !canWrite) {
-    final uri = await saf.openDocumentTree(
-      grantWritePermission: true,
-      persistablePermission: true,
-      initialUri: Uri.parse(kAndroidDocumentsDirectoryUri),
-    );
-    if (uri == null || uri != downloadDirectoryUri) {
-      return null;
+  Uri? savedDirectoryUri = _savedDirectory();
+  if (savedDirectoryUri != null) {
+    final bool? canWrite = await saf.canWrite(savedDirectoryUri);
+    if (canWrite != null && canWrite) {
+      return savedDirectoryUri;
     }
   }
 
-  saf.DocumentFile? appFolder =
-      await saf.child(downloadDirectoryUri, kAppFolder);
-  if (appFolder == null) {
-    appFolder = await saf.createDirectory(downloadDirectoryUri, kAppFolder);
-    if (appFolder == null) {
-      return null;
-    }
+  final uri = await saf.openDocumentTree(
+    grantWritePermission: true,
+    persistablePermission: true,
+  );
+  if (uri != null) {
+    await CustomConfigRepository().setOutputDirectory(uri.toString());
   }
 
-  return appFolder.uri;
+  return uri;
+}
+
+Uri? _savedDirectory() {
+  String? uriString = CustomConfigRepository().outputDirectory;
+  if (uriString != null) {
+    return Uri.tryParse(uriString);
+  }
+  return null;
 }
 
 Future<Uri?> _getIosOutputDirectory() async {
