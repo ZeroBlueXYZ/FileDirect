@@ -71,7 +71,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     if (directory == null) {
       return;
     }
-    debugPrint(directory.toString());
     _receiveChannel.outputDirectory = directory;
     _files.clear();
 
@@ -221,10 +220,20 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                     ScaffoldMessenger.of(context)
                         .showSnackBar(ongoingTaskSnackBar(context));
                   } else {
-                    await _startReceive(
-                      parentContext,
-                      state,
-                      _codeTextEditingController.text,
+                    await needStoragePermission(
+                      onYes: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => ChangeNotifierProvider.value(
+                            value: state,
+                            child: _storagePermissionDialog(parentContext),
+                          ),
+                        );
+                      },
+                      onNo: () {
+                        _startReceive(parentContext, state,
+                            _codeTextEditingController.text);
+                      },
                     );
                   }
                 }
@@ -244,10 +253,20 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         builder: (context, state, child) => NearbyCard(
           package: nearbyPackages[index].key,
           onTap: () async {
-            await _startReceive(
-              parentContext,
-              state,
-              nearbyPackages[index].key.code,
+            await needStoragePermission(
+              onYes: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => ChangeNotifierProvider.value(
+                    value: state,
+                    child: _storagePermissionDialog(parentContext),
+                  ),
+                );
+              },
+              onNo: () {
+                _startReceive(
+                    parentContext, state, nearbyPackages[index].key.code);
+              },
             );
           },
         ),
@@ -387,6 +406,31 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       },
       linearProgressIndicator: LinearProgressIndicator(
         value: _receiveChannel.receiveProgress,
+      ),
+    );
+  }
+
+  Widget _storagePermissionDialog(BuildContext parentContext) {
+    return Consumer<JobStateModel>(
+      builder: (context, state, child) => AlertDialog(
+        content: Text(
+          AppLocalizations.of(context)!.textRequestForStoragePermission,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _startReceive(
+                parentContext,
+                state,
+                _codeTextEditingController.text,
+              );
+            },
+            child: Text(
+              AppLocalizations.of(context)!.textOk,
+            ),
+          )
+        ],
       ),
     );
   }

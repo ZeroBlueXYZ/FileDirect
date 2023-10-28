@@ -18,8 +18,9 @@
   "textEnterReceiveCodeFromSender": "Enter 6 digit share code",
   "textCode": "Code",
   "textNearby": "Nearby",
+  "textRequestForStoragePermission": "We will request for the permission to store received files. Don't change the default location in the file explorer.",
   "textReceviedFileLocationQuestion": "Where are received files?",
-  "textReceviedFileLocationAnswer": "Received files are stored in the app folder on IOS and in the download folder on other platforms.",
+  "textReceviedFileLocationAnswer": "IOS: App folder\nAndroid: Documents folder\nOther Platforms: Downloads folder",
   "textRequestForReceive": "{name}\nrequests to receive data",
   "@textRequestForReceive": {
     "placeholders": {

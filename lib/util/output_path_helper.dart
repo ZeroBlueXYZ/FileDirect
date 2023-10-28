@@ -7,6 +7,21 @@ const String kAppFolder = "AnySend";
 const String kAndroidDocumentsDirectoryUri =
     "content://com.android.externalstorage.documents/tree/primary%3ADocuments";
 
+Future<void> needStoragePermission({
+  void Function()? onYes,
+  void Function()? onNo,
+}) async {
+  if (Platform.isAndroid) {
+    Uri downloadDirectoryUri = Uri.parse(kAndroidDocumentsDirectoryUri);
+    final bool? canWrite = await saf.canWrite(downloadDirectoryUri);
+    if (canWrite == null || !canWrite) {
+      onYes?.call();
+      return;
+    }
+  }
+  onNo?.call();
+}
+
 Future<Uri?> getOutputDirectory() async {
   if (Platform.isAndroid) {
     return await _getAndroidOutputDirectory();
