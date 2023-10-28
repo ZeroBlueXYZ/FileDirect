@@ -18,7 +18,7 @@
   "textEnterReceiveCodeFromSender": "输入6位数字分享码",
   "textCode": "代码",
   "textNearby": "附近的",
-  "textRequestForStoragePermission": "选择一个文件夹用来存放收到的文件。",
+  "textRequestForStoragePermission": "您将被提示选择存储接收文件的位置。",
   "textReceviedFileLocationQuestion": "收到的文件在哪里？",
   "textReceviedFileLocationAnswer": "Android: 用户选择的位置\nIOS: 应用文件夹\n其他平台: 下载文件夹",
   "textRequestForReceive": "{name}\n请求接收数据",

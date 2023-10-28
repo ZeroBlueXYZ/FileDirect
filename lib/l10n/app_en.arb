@@ -18,7 +18,7 @@
   "textEnterReceiveCodeFromSender": "Enter 6 digit share code",
   "textCode": "Code",
   "textNearby": "Nearby",
-  "textRequestForStoragePermission": "Pick a folder to store recevied files.",
+  "textRequestForStoragePermission": "You will be prompted to choose where to store received files.",
   "textReceviedFileLocationQuestion": "Where are received files?",
   "textReceviedFileLocationAnswer": "Android: User selected location\nIOS: App folder\nOther Platforms: Downloads folder",
   "textRequestForReceive": "{name}\nrequests to receive data",
