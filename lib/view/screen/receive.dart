@@ -418,12 +418,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   Widget _storagePermissionDialog(BuildContext parentContext, String code) {
     return Consumer<JobStateModel>(
-      builder: (context, state, child) => AlertDialog(
+      builder: (context, state, child) => SimpleDialog(
         title: Text(
           AppLocalizations.of(context)!.textRequestForStoragePermission,
         ),
-        actions: [
-          TextButton(
+        children: [
+          SimpleDialogOption(
             onPressed: () async {
               Navigator.pop(context);
               await _startReceive(
@@ -434,6 +434,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             },
             child: Text(
               AppLocalizations.of(context)!.textOk,
+              textAlign: TextAlign.center,
             ),
           )
         ],
