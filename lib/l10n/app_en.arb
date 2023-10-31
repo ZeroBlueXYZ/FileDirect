@@ -35,6 +35,7 @@
   "warningInterruptedNetworkError": "Peer connection was interrupted.",
   "warningOngoingTask": "Please wait for the ongoing task to complete first.",
   "warningInvalidCode": "Share code doesn't exist.",
+  "warningCodeCopiedToClipboard": "Share code has been copied to clipboard.",
   "warningDeniedBySender": "Transfer request was denied by sender.",
   "warningCanceledByPeer": "Transfer was canceled by peer.",
   "fileCount": "{count, plural, =0{0 File} =1{1 File} other{{count} Files}}",

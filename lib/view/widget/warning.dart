@@ -48,6 +48,13 @@ SnackBar invalidCodeSnackBar(BuildContext context) {
   );
 }
 
+SnackBar codeCopiedToClipboardSnackBar(BuildContext context) {
+  return SnackBar(
+    content: Text(AppLocalizations.of(context)!.warningCodeCopiedToClipboard),
+    duration: const Duration(seconds: 3),
+  );
+}
+
 SnackBar deniedBySenderSnackBar(
   BuildContext context, {
   required void Function() onPressed,
