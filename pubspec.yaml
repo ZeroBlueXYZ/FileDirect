@@ -36,6 +36,7 @@ dev_dependencies:
     sdk: flutter
   import_sorter: ^4.6.0
   json_serializable: ^6.7.1
+  msix: ^3.16.6
 
 flutter:
   generate: true
@@ -43,3 +44,14 @@ flutter:
 
 import_sorter:
   comments: false
+
+msix_config:
+  display_name: ZeroBlue AnySend
+  publisher_display_name: ZeroBlue
+  identity_name: 45119ZeroBlue.ZeroBlueAnySend
+  publisher: CN=BB79A522-16C1-4E37-9E0D-84749E370391
+  msix_version: 1.0.1.0
+  store: true
+  capabilities: runFullTrust, internetClient, internetClientServer
+  languages: en, zh-cn
+  build_windows: false

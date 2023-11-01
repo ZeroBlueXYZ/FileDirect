@@ -8,7 +8,8 @@ set BUILD_NUMBER=%2
 set DEBUG_INFO_DIR=.\debug_info\%BUILD_NAME%+%BUILD_NUMBER%\windows
 
 if not exist %DEBUG_INFO_DIR% mkdir %DEBUG_INFO_DIR%
-flutter build windows --obfuscate --split-debug-info=%DEBUG_INFO_DIR% --build-name=%BUILD_NAME% --build-number=%BUILD_NUMBER%
+call flutter build windows --obfuscate --split-debug-info=%DEBUG_INFO_DIR% --build-name=%BUILD_NAME% --build-number=%BUILD_NUMBER%
+call dart run msix:create
 goto :eof
 
 :error
