@@ -55,3 +55,4 @@ msix_config:
   capabilities: runFullTrust, internetClient, internetClientServer
   languages: en, zh-cn
   build_windows: false
+  logo_path: C:\Users\zmzhang\Documents\anysend_client\assets\icon\icon.png
