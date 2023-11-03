@@ -1,0 +1,29 @@
+name: Release MSIX to Microsoft Store
+
+on: workflow_dispatch
+
+# Declare default permissions as read only.
+permissions: read-all
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: subosito/flutter-action@cc97e1648fff6ca5cc647fa67f47e70f7895510b # v2.11.0
+      - uses: dart-lang/setup-dart@b64355ae6ca0b5d484f0106a033dd1388965d06d # v1.6.0
+      - uses: microsoft/setup-msstore-cli@3b2ec9136230357ce9abc02b9d056626fb248d3f # v1
+
+      # Instructions on obtaining these secrets can be found at https://github.com/marketplace/actions/windows-store-publish#obtaining-your-credentials
+      - name: Configure MS CLI
+        run: msstore reconfigure --tenantId ${{ secrets.AZURE_AD_TENANT_ID }} --clientId ${{ secrets.AZURE_AD_CLIENT_ID }} --clientSecret ${{ secrets.AZURE_AD_CLIENT_SECRET }} --sellerId ${{ secrets.SELLER_ID }}
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Create MSIX package
+        run: msstore package
+
+      - name: Publish MSIX to the Microsoft Store
+        run: msstore publish -v
