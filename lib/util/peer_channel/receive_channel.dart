@@ -206,13 +206,6 @@ class ReceiveChannel extends PeerChannel {
 
   Future<void> _handleFilesList(ListFilesResponse resp) async {
     for (FileInfo file in resp.files) {
-      // _files.add(JobFile(
-      //   info: FileInfo(
-      //     name: file.name,
-      //     size: file.size,
-      //     path: path.join(outputDirectory!, file.name),
-      //   ),
-      // ));
       _files.add(JobFile.inDirectory(
         directoryUri: outputDirectory!,
         name: file.name,
