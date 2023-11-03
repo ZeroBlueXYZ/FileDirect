@@ -46,13 +46,14 @@ import_sorter:
   comments: false
 
 msix_config:
+  msix_version: 1.0.2.0
+  msstore_appId: 9NPKG5X6W2SZ
   display_name: ZeroBlue AnySend
   publisher_display_name: ZeroBlue
   identity_name: 45119ZeroBlue.ZeroBlueAnySend
   publisher: CN=BB79A522-16C1-4E37-9E0D-84749E370391
-  msix_version: 1.0.1.0
   store: true
   capabilities: runFullTrust, internetClient, internetClientServer
   languages: en, zh-cn
-  build_windows: false
-  logo_path: C:\Users\zmzhang\Documents\anysend_client\assets\icon\icon.png
+  windows_build_args: --obfuscate --split-debug-info=debug_info\windows
+  logo_path: windows\runner\resources\app_icon.png
