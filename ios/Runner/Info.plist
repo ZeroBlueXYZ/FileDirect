@@ -14,6 +14,8 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Share photo to another device</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Declared by the webrtc dependency but not actually used</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
