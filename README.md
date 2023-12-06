@@ -1,4 +1,4 @@
-# AnySend
+# AirDrop Plus
 
 ## Getting Started
 
