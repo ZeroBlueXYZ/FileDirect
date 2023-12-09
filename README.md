@@ -23,3 +23,4 @@ dart run build_runner build --delete-conflicting-outputs
 ## References
 - [Material Theme Builder](https://m3.material.io/theme-builder)
 - [Internationalization in Flutter](https://docs.flutter.dev/ui/accessibility-and-localization/internationalization)
+- [Continuous Deployment to Miscrosoft Store](https://docs.flutter.dev/deployment/windows#github-actions-cicd)
