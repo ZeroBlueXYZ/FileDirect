@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Build executable
+        run: flutter build windows --obfuscate
+
       - name: Create MSIX package
         run: msstore package
 
