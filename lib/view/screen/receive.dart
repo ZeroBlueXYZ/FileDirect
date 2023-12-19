@@ -69,6 +69,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   ) async {
     Uri? directory = await getOutputDirectory();
     if (directory == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(unknownErrorSnackBar(context));
+      }
       return;
     }
     _receiveChannel.outputDirectory = directory;
@@ -134,6 +138,26 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     }
   }
 
+  Future<void> _onReceive(
+    BuildContext parentContext,
+    JobStateModel state,
+    String code,
+  ) async {
+    await requestStoragePermission(
+      onSuccess: () {
+        _startReceive(
+          parentContext,
+          state,
+          code,
+        );
+      },
+      onFailure: () {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(storagePermissionErrorSnackBar(context));
+      },
+    );
+  }
+
   @override
   void initState() {
     _refreshAnnounce();
@@ -172,7 +196,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Text(
-            AppLocalizations.of(context)!.textCode,
+            AppLocalizations.of(context)!.textShareCode,
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
@@ -220,23 +244,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                     ScaffoldMessenger.of(context)
                         .showSnackBar(ongoingTaskSnackBar(context));
                   } else {
-                    await needStoragePermission(
-                      onYes: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => ChangeNotifierProvider.value(
-                            value: state,
-                            child: _storagePermissionDialog(
-                              parentContext,
-                              _codeTextEditingController.text,
-                            ),
-                          ),
-                        );
-                      },
-                      onNo: () {
-                        _startReceive(parentContext, state,
-                            _codeTextEditingController.text);
-                      },
+                    _onReceive(
+                      parentContext,
+                      state,
+                      _codeTextEditingController.text,
                     );
                   }
                 }
@@ -255,26 +266,11 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       itemBuilder: (context, index) => Consumer<JobStateModel>(
         builder: (context, state, child) => NearbyCard(
           package: nearbyPackages[index].key,
-          onTap: () async {
-            await needStoragePermission(
-              onYes: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => ChangeNotifierProvider.value(
-                    value: state,
-                    child: _storagePermissionDialog(
-                      parentContext,
-                      nearbyPackages[index].key.code,
-                    ),
-                  ),
-                );
-              },
-              onNo: () {
-                _startReceive(
-                    parentContext, state, nearbyPackages[index].key.code);
-              },
-            );
-          },
+          onTap: () => _onReceive(
+            parentContext,
+            state,
+            nearbyPackages[index].key.code,
+          ),
         ),
       ),
       separatorBuilder: (context, index) {
@@ -412,32 +408,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       },
       linearProgressIndicator: LinearProgressIndicator(
         value: _receiveChannel.receiveProgress,
-      ),
-    );
-  }
-
-  Widget _storagePermissionDialog(BuildContext parentContext, String code) {
-    return Consumer<JobStateModel>(
-      builder: (context, state, child) => SimpleDialog(
-        title: Text(
-          AppLocalizations.of(context)!.textRequestForStoragePermission,
-        ),
-        children: [
-          SimpleDialogOption(
-            onPressed: () async {
-              Navigator.pop(context);
-              await _startReceive(
-                parentContext,
-                state,
-                code,
-              );
-            },
-            child: Text(
-              AppLocalizations.of(context)!.textOk,
-              textAlign: TextAlign.center,
-            ),
-          )
-        ],
       ),
     );
   }

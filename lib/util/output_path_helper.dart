@@ -5,28 +5,45 @@ import 'package:shared_storage/shared_storage.dart' as saf;
 
 import 'package:anysend/repository/custom_config.dart';
 
-Future<void> needStoragePermission({
-  void Function()? onYes,
-  void Function()? onNo,
+Future<void> requestStoragePermission({
+  void Function()? onSuccess,
+  void Function()? onFailure,
 }) async {
   if (Platform.isAndroid) {
-    Uri? savedDirectoryUri = _savedDirectory();
+    Uri? savedDirectoryUri = getOutputDirectoryFromConfig();
     if (savedDirectoryUri != null) {
       final bool? canWrite = await saf.canWrite(savedDirectoryUri);
       if (canWrite != null && canWrite) {
-        onNo?.call();
+        onSuccess?.call();
         return;
       }
     }
-    onYes?.call();
+    final uri = await saf.openDocumentTree(
+      grantWritePermission: true,
+      persistablePermission: true,
+    );
+    if (uri != null) {
+      await CustomConfigRepository().setOutputDirectory(uri.toString());
+      onSuccess?.call();
+    } else {
+      onFailure?.call();
+    }
   } else {
-    onNo?.call();
+    onSuccess?.call();
   }
+}
+
+Uri? getOutputDirectoryFromConfig() {
+  String? uriString = CustomConfigRepository().outputDirectory;
+  if (uriString != null) {
+    return Uri.tryParse(uriString);
+  }
+  return null;
 }
 
 Future<Uri?> getOutputDirectory() async {
   if (Platform.isAndroid) {
-    return await _getAndroidOutputDirectory();
+    return getOutputDirectoryFromConfig();
   } else if (Platform.isIOS) {
     return _getIosOutputDirectory();
   } else {
@@ -36,34 +53,6 @@ Future<Uri?> getOutputDirectory() async {
     }
     return Uri.directory(directory.path, windows: Platform.isWindows);
   }
-}
-
-Future<Uri?> _getAndroidOutputDirectory() async {
-  Uri? savedDirectoryUri = _savedDirectory();
-  if (savedDirectoryUri != null) {
-    final bool? canWrite = await saf.canWrite(savedDirectoryUri);
-    if (canWrite != null && canWrite) {
-      return savedDirectoryUri;
-    }
-  }
-
-  final uri = await saf.openDocumentTree(
-    grantWritePermission: true,
-    persistablePermission: true,
-  );
-  if (uri != null) {
-    await CustomConfigRepository().setOutputDirectory(uri.toString());
-  }
-
-  return uri;
-}
-
-Uri? _savedDirectory() {
-  String? uriString = CustomConfigRepository().outputDirectory;
-  if (uriString != null) {
-    return Uri.tryParse(uriString);
-  }
-  return null;
 }
 
 Future<Uri?> _getIosOutputDirectory() async {
