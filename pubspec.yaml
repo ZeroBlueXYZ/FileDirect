@@ -44,7 +44,7 @@ import_sorter:
   comments: false
 
 msix_config:
-  msix_version: 1.0.4.0
+  msix_version: 1.0.6.0
   msstore_appId: 9NPKG5X6W2SZ
   display_name: FileDirect
   publisher_display_name: ZeroBlue
