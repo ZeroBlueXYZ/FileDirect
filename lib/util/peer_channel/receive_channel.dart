@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -43,7 +44,7 @@ class ReceiveChannel extends PeerChannel {
       ? "∞"
       : ((totalFileSize - receivedFileSize) ~/ speedInBytes).readableDuration();
 
-  Uri? outputDirectory;
+  Directory? outputDirectory;
   void Function(bool)? onAcceptOrDeny;
 
   @override
@@ -207,7 +208,7 @@ class ReceiveChannel extends PeerChannel {
   Future<void> _handleFilesList(ListFilesResponse resp) async {
     for (FileInfo file in resp.files) {
       _files.add(JobFile.inDirectory(
-        directoryUri: outputDirectory!,
+        directory: outputDirectory!,
         name: file.name,
         size: file.size,
       ));

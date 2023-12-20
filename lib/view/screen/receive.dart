@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -67,7 +68,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     JobStateModel state,
     String code,
   ) async {
-    Uri? directory = await getOutputDirectory();
+    Directory? directory = await getOutputDirectory();
     if (directory == null) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -136,26 +137,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       await _receiveChannel.askToReceive(_name);
       state.value = JobState.waitingForSenderToAccept;
     }
-  }
-
-  Future<void> _onReceive(
-    BuildContext parentContext,
-    JobStateModel state,
-    String code,
-  ) async {
-    await requestStoragePermission(
-      onSuccess: () {
-        _startReceive(
-          parentContext,
-          state,
-          code,
-        );
-      },
-      onFailure: () {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(storagePermissionErrorSnackBar(context));
-      },
-    );
   }
 
   @override
@@ -244,7 +225,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                     ScaffoldMessenger.of(context)
                         .showSnackBar(ongoingTaskSnackBar(context));
                   } else {
-                    _onReceive(
+                    _startReceive(
                       parentContext,
                       state,
                       _codeTextEditingController.text,
@@ -266,7 +247,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       itemBuilder: (context, index) => Consumer<JobStateModel>(
         builder: (context, state, child) => NearbyCard(
           package: nearbyPackages[index].key,
-          onTap: () => _onReceive(
+          onTap: () => _startReceive(
             parentContext,
             state,
             nearbyPackages[index].key.code,

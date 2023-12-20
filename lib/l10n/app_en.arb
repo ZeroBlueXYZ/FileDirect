@@ -19,7 +19,7 @@
   "textShareCode": "Share Code",
   "textNearby": "Nearby",
   "textReceviedFileLocationQuestion": "Where are received files?",
-  "textReceviedFileLocationAnswer": "Android: User selected location\nIOS: App folder\nOther Platforms: Downloads folder",
+  "textReceviedFileLocationAnswer": "IOS: App folder\nOther Platforms: Downloads folder",
   "textRequestForReceive": "{name}\nrequests to receive data",
   "@textRequestForReceive": {
     "placeholders": {
