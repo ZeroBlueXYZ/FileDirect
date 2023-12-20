@@ -21,7 +21,7 @@ jobs:
         run: flutter pub get
 
       - name: Build executable
-        run: flutter build windows --obfuscate --split-debug-info=debug-info
+        run: flutter build windows
 
       # Instructions on obtaining these secrets can be found at https://github.com/marketplace/actions/windows-store-publish#obtaining-your-credentials
       - name: Configure MS CLI
