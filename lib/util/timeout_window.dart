@@ -4,7 +4,7 @@ class TimeoutWindow {
   final Queue<TimeoutNum> _queue = Queue();
   late final Duration _timeout;
 
-  TimeoutWindow({int timeoutInSeconds = 3}) {
+  TimeoutWindow({int timeoutInSeconds = 5}) {
     if (timeoutInSeconds <= 0 || timeoutInSeconds > 60) {
       throw "timeout must be in the range [1, 60]";
     }

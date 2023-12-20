@@ -101,7 +101,7 @@ class SendChannel extends PeerChannel {
       await createRtcPeerConnection();
       await createDataChannel(
         "data",
-        ordered: true,
+        ordered: false,
         onDataChannelClosed: onDataChannelClosed,
         onDataChannelTextMessage: _onDataChannelTextMessage,
       );
