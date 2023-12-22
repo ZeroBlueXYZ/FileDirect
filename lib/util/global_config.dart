@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import 'package:anysend/model/auth_token.dart';
 import 'package:anysend/util/string_helper.dart';
 
@@ -10,7 +12,15 @@ class GlobalConfig {
   late final String serverUri;
   AuthToken? authToken;
 
-  void ensureInit({required String serverUri}) {
-    this.serverUri = serverUri;
+  void ensureInit() {
+    serverUri = isCn()
+        ? "https://anysend-api-cn.zeroblue.xyz"
+        : "https://anysend-api.zeroblue.xyz";
+  }
+
+  bool isCn() {
+    return WidgetsBinding.instance.platformDispatcher.locale.countryCode ==
+            "CN" &&
+        DateTime.now().timeZoneOffset.inHours == 8;
   }
 }

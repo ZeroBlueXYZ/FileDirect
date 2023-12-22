@@ -16,6 +16,6 @@ abstract class BaseRepository {
     retryPolicy: ServiceRetryPolicy(
       authServerUri: "${GlobalConfig().serverUri}/auth/anonymous-login",
     ),
-    requestTimeout: const Duration(seconds: 2),
+    requestTimeout: const Duration(seconds: 1),
   );
 }

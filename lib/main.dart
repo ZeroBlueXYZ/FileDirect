@@ -5,7 +5,7 @@ import 'package:anysend/util/global_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  GlobalConfig().ensureInit(serverUri: "https://anysend-api.zeroblue.xyz");
+  GlobalConfig().ensureInit();
 
   runApp(const App());
 }
