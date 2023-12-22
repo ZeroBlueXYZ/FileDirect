@@ -4,8 +4,6 @@
 
 FileDirect is a free and open-source app that helps you share and receives files with nearby and remote devices.
 
-[TOC]
-
 ## Development
 
 ### Getting Started
