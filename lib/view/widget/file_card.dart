@@ -43,19 +43,24 @@ class FileCard extends StatelessWidget {
   }
 
   Widget _leading() {
-    if (fileInfo.name.isImage()) {
-      if (showPreview) {
-        return Image.file(
-          File(fileInfo.path!),
-          errorBuilder: (context, error, stackTrace) => const Icon(Icons.image),
-        );
+    if (fileInfo.textData == null) {
+      if (fileInfo.name.isImage()) {
+        if (showPreview) {
+          return Image.file(
+            File(fileInfo.path!),
+            errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.image),
+          );
+        } else {
+          return const Icon(Icons.image);
+        }
+      } else if (fileInfo.name.isVideo()) {
+        return const Icon(Icons.video_file);
       } else {
-        return const Icon(Icons.image);
+        return const Icon(Icons.description);
       }
-    } else if (fileInfo.name.isVideo()) {
-      return const Icon(Icons.video_file);
     } else {
-      return const Icon(Icons.description);
+      return const Icon(Icons.message);
     }
   }
 }

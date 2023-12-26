@@ -14,11 +14,14 @@ class FileInfo {
   @JsonKey(required: true)
   final int size;
 
-  String? path;
+  String? textData; // for text
+
+  String? path; // for file
 
   FileInfo({
     required this.name,
     required this.size,
+    this.textData,
     this.path,
   });
 
@@ -63,6 +66,14 @@ class JobFile {
 
   Future<void> closeWrite() async {
     await _ioSink?.close();
+  }
+
+  void markReadComplete() {
+    readSizeInBytes = info.size;
+  }
+
+  void markWriteComplete() {
+    _writeOffset = info.size;
   }
 }
 

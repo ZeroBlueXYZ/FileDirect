@@ -146,6 +146,15 @@ class SendChannel extends PeerChannel {
       message: jsonEncode(resp.toJson()),
     );
     await sendTextData(jsonEncode(dataSignal.toJson()));
+
+    // mark text messages complete
+    for (int index = req.page; index < end; index++) {
+      final file = _files[index];
+      if (file.info.textData != null) {
+        file.markReadComplete();
+        _timeoutWindow.add(file.info.size.toDouble());
+      }
+    }
   }
 
   Future<void> _sendChunk(GetChunkRequest req) async {
@@ -154,7 +163,8 @@ class SendChannel extends PeerChannel {
     }
 
     JobFile file = _files[req.fileId];
-    if (req.start < 0 ||
+    if (file.info.path == null ||
+        req.start < 0 ||
         req.start >= file.info.size ||
         req.end <= 0 ||
         req.end > file.info.size ||

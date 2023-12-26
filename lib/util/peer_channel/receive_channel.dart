@@ -152,6 +152,7 @@ class ReceiveChannel extends PeerChannel {
       if (chunk.offset > file.writeOffset) {
         break;
       } else if (chunk.offset == file.writeOffset) {
+        await file.openWrite();
         await file.write(_buffer.removeFirst().data);
 
         if (file.requestedOffset < file.info.size &&
@@ -162,10 +163,9 @@ class ReceiveChannel extends PeerChannel {
           await _sendGetChunk(chunk.fileId, start, file.requestedOffset);
         } else if (file.writeOffset == file.info.size) {
           await file.closeWrite();
-          int nextFileId = chunk.fileId + 1;
+          int nextFileId = _nextFileId(chunk.fileId);
           if (nextFileId < _files.length) {
             JobFile nextFile = _files[nextFileId];
-            await nextFile.openWrite();
             nextFile.requestedOffset =
                 min(nextFile.info.size, maxBufferSizeInBytes);
             await _sendGetChunk(nextFileId, 0, nextFile.requestedOffset);
@@ -206,22 +206,38 @@ class ReceiveChannel extends PeerChannel {
   }
 
   Future<void> _handleFilesList(ListFilesResponse resp) async {
-    for (FileInfo file in resp.files) {
-      _files.add(JobFile.inDirectory(
-        directory: outputDirectory!,
-        name: file.name,
-        size: file.size,
-      ));
+    for (FileInfo fileInfo in resp.files) {
+      if (fileInfo.textData == null) {
+        _files.add(JobFile.inDirectory(
+          directory: outputDirectory!,
+          name: fileInfo.name,
+          size: fileInfo.size,
+        ));
+      } else {
+        _files.add(JobFile(info: fileInfo));
+      }
     }
 
     if (resp.nextPage >= 0) {
       await _sendListFiles(resp.nextPage);
     } else {
-      if (_files.isNotEmpty) {
-        JobFile file = _files[0];
-        await file.openWrite();
+      // mark text messages complete
+      for (final file in _files) {
+        if (file.info.textData != null) {
+          file.markWriteComplete();
+          _timeoutWindow.add(file.info.size.toDouble());
+        }
+      }
+
+      // get files
+      int nextFileId = _nextFileId(-1);
+      if (nextFileId < _files.length) {
+        JobFile file = _files[nextFileId];
         file.requestedOffset = min(file.info.size, maxBufferSizeInBytes);
-        await _sendGetChunk(0, 0, file.requestedOffset);
+        await _sendGetChunk(nextFileId, 0, file.requestedOffset);
+      } else {
+        sendSignal(type: SignalTypes.done);
+        onDone?.call();
       }
     }
   }
@@ -233,5 +249,17 @@ class ReceiveChannel extends PeerChannel {
       message: jsonEncode(req.toJson()),
     );
     await sendTextData(jsonEncode(dataSignal.toJson()));
+  }
+
+  int _nextFileId(int currentId) {
+    if (currentId >= _files.length) {
+      return currentId;
+    }
+
+    int nextId = currentId + 1;
+    while (nextId < _files.length && _files[nextId].info.textData != null) {
+      nextId++;
+    }
+    return nextId;
   }
 }

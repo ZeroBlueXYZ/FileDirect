@@ -200,6 +200,11 @@ class _SendScreenState extends State<SendScreen> {
               label: AppLocalizations.of(context)!.textVideo,
               onPressed: () => _pickFiles(type: FileType.video),
             ),
+          _pickButton(
+            icon: Icons.message,
+            label: AppLocalizations.of(context)!.textSecureMessage,
+            onPressed: null,
+          ),
         ],
       ),
     );
