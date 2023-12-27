@@ -85,8 +85,9 @@ class _SendScreenState extends State<SendScreen> {
       file.readSizeInBytes = 0;
     }
 
-    if (state.isReceive) {
-      ScaffoldMessenger.of(context).showSnackBar(ongoingTaskSnackBar(context));
+    if (state.isReceiveBusy) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(receiveJobRunningSnackBar(context));
     } else {
       await _packageRepo.create().then((value) async {
         _package = value;
@@ -103,13 +104,13 @@ class _SendScreenState extends State<SendScreen> {
               await _sendChannel.close();
               await WakelockPlus.disable();
               _progressTimer?.cancel();
-              state.value = JobState.ready;
+              state.sendState = JobState.ready;
             },
             onDone: () async {
               await _sendChannel.close();
               await WakelockPlus.disable();
               _progressTimer?.cancel();
-              state.value = JobState.sent;
+              state.sendState = JobState.done;
             },
             onCancel: () async {
               ScaffoldMessenger.of(context).showSnackBar(canceledByPeerSnackBar(
@@ -119,7 +120,7 @@ class _SendScreenState extends State<SendScreen> {
               await _sendChannel.close();
               await WakelockPlus.disable();
               _progressTimer?.cancel();
-              state.value = JobState.ready;
+              state.sendState = JobState.ready;
             },
             onAskToReceive: (peerId, name) async {
               if (_sendChannel.peerId != null) {
@@ -141,7 +142,7 @@ class _SendScreenState extends State<SendScreen> {
           _announceTimer = Timer.periodic(announcePeriod, (timer) {
             _packageRepo.send(code: code, expireTime: expireTime);
           });
-          state.value = JobState.waitingForReceiverToConnect;
+          state.sendState = JobState.waiting;
         }
       });
     }
@@ -162,8 +163,9 @@ class _SendScreenState extends State<SendScreen> {
       child: Consumer<JobStateModel>(
         builder: (context, state, child) => Column(
           children: [
-            if (!state.isSend) _pickButtons(),
-            if (!state.isSend && _files.isNotEmpty) _deleteAllTile(),
+            if (state.sendState == JobState.ready) _pickButtons(),
+            if (state.sendState == JobState.ready && _files.isNotEmpty)
+              _deleteAllTile(),
             Expanded(child: _fileList()),
             if (_files.isNotEmpty) _actionCard(),
           ],
@@ -258,14 +260,15 @@ class _SendScreenState extends State<SendScreen> {
         builder: (context, state, child) {
           return FileCard(
             fileInfo: _files[index].info,
-            trailingIcon: state.isSend ? null : Icons.delete,
+            trailingIcon:
+                state.sendState == JobState.ready ? Icons.delete : null,
             onTrailingIconPressed: () {
               setState(() {
                 _files.removeAt(index);
               });
             },
             showPreview: true,
-            onTap: state.value == JobState.ready &&
+            onTap: state.sendState == JobState.ready &&
                     _files[index].info.textData != null
                 ? () {
                     Navigator.push(
@@ -299,12 +302,12 @@ class _SendScreenState extends State<SendScreen> {
 
   Widget _actionCard() {
     return Consumer<JobStateModel>(builder: (context, state, child) {
-      switch (state.value) {
-        case JobState.waitingForReceiverToConnect:
+      switch (state.sendState) {
+        case JobState.waiting:
           return _waitingStateActionCard(state);
-        case JobState.sending:
+        case JobState.running:
           return _sendingStateActionCard(state);
-        case JobState.sent:
+        case JobState.done:
           return _sentStateActionCard(state);
         default:
           return _readyStateActionCard(state);
@@ -347,7 +350,7 @@ class _SendScreenState extends State<SendScreen> {
               _announceTimer?.cancel();
               await _sendChannel.close();
               await WakelockPlus.disable();
-              state.value = JobState.ready;
+              state.sendState = JobState.ready;
             },
           ),
         ],
@@ -365,7 +368,7 @@ class _SendScreenState extends State<SendScreen> {
         _announceTimer?.cancel();
         await _sendChannel.close();
         await WakelockPlus.disable();
-        state.value = JobState.ready;
+        state.sendState = JobState.ready;
       },
     );
   }
@@ -386,7 +389,7 @@ class _SendScreenState extends State<SendScreen> {
             await _sendChannel.close().then((_) async {
               WakelockPlus.disable();
               _progressTimer?.cancel();
-              state.value = JobState.ready;
+              state.sendState = JobState.ready;
               Navigator.pop(context);
             });
           } else {
@@ -406,14 +409,15 @@ class _SendScreenState extends State<SendScreen> {
     return ActionCard(
       subtitle: Text(
           "${_sendChannel.sentFileCount} / $fileCountText\n${_sendChannel.sentFileSize.readableFileSize()} / ${_sendChannel.totalFileSize.readableFileSize()}"),
-      trailingIcon: state.value == JobState.sending ? Icons.cancel : Icons.done,
+      trailingIcon:
+          state.sendState == JobState.running ? Icons.cancel : Icons.done,
       onTrailingIconPressed: () async {
         await _sendChannel.close();
         await WakelockPlus.disable();
         setState(() {
           _files.clear();
         });
-        state.value = JobState.ready;
+        state.sendState = JobState.ready;
       },
       linearProgressIndicator: LinearProgressIndicator(
         value: _sendChannel.sentProgress,
@@ -450,7 +454,7 @@ class _SendScreenState extends State<SendScreen> {
                 _progressTimer = Timer.periodic(progressPeriod, (timer) {
                   setState(() {});
                 });
-                state.value = JobState.sending;
+                state.sendState = JobState.running;
               }).onError((error, stackTrace) {
                 ScaffoldMessenger.of(context)
                     .showSnackBar(unknownErrorSnackBar(context));

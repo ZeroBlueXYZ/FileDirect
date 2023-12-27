@@ -36,9 +36,15 @@ SnackBar interruptedNetworkErrorSnackBar(
   );
 }
 
-SnackBar ongoingTaskSnackBar(BuildContext context) {
+SnackBar receiveJobRunningSnackBar(BuildContext context) {
   return SnackBar(
-    content: Text(AppLocalizations.of(context)!.warningOngoingTask),
+    content: Text(AppLocalizations.of(context)!.warningReceiveJobRunning),
+  );
+}
+
+SnackBar sendJobRunningSnackBar(BuildContext context) {
+  return SnackBar(
+    content: Text(AppLocalizations.of(context)!.warningSendJobRunning),
   );
 }
 

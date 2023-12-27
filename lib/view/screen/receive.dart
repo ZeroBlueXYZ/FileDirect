@@ -92,13 +92,13 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                 await _receiveChannel.close();
                 await WakelockPlus.disable();
                 _progressTimer?.cancel();
-                state.value = JobState.ready;
+                state.receiveState = JobState.ready;
               },
               onDone: () async {
                 await _receiveChannel.close();
                 await WakelockPlus.disable();
                 _progressTimer?.cancel();
-                state.value = JobState.received;
+                state.receiveState = JobState.done;
               },
               onCancel: () async {
                 ScaffoldMessenger.of(parentContext)
@@ -109,14 +109,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                 await _receiveChannel.close();
                 await WakelockPlus.disable();
                 _progressTimer?.cancel();
-                state.value = JobState.ready;
+                state.receiveState = JobState.ready;
               },
               onAcceptOrDeny: (accept) async {
                 if (accept) {
                   _progressTimer = Timer.periodic(progressPeriod, (timer) {
                     setState(() {});
                   });
-                  state.value = JobState.receiving;
+                  state.receiveState = JobState.running;
                 } else {
                   ScaffoldMessenger.of(parentContext)
                       .showSnackBar(deniedBySenderSnackBar(
@@ -125,12 +125,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                   ));
                   await _receiveChannel.close();
                   await WakelockPlus.disable();
-                  state.value = JobState.ready;
+                  state.receiveState = JobState.ready;
                 }
               },
             );
             await _receiveChannel.askToReceive(_name);
-            state.value = JobState.waitingForSenderToAccept;
+            state.receiveState = JobState.waiting;
           }
         });
       }
@@ -159,13 +159,13 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Consumer<JobStateModel>(
-        builder: (context, state, child) => state.isReceive
-            ? Column(children: [
-                if (state.value == JobState.received) _fileLocationButton(),
+        builder: (context, state, child) => state.receiveState == JobState.ready
+            ? _readyStateWidget(context)
+            : Column(children: [
+                if (state.receiveState == JobState.done) _fileLocationButton(),
                 Expanded(child: _fileList()),
                 _actionCard(),
-              ])
-            : _readyStateWidget(context),
+              ]),
       ),
     );
   }
@@ -221,9 +221,9 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
               onPressed: () async {
                 if (_codeFormKey.currentState != null &&
                     _codeFormKey.currentState!.validate()) {
-                  if (state.isSend) {
+                  if (state.isSendBusy) {
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(ongoingTaskSnackBar(context));
+                        .showSnackBar(sendJobRunningSnackBar(context));
                   } else {
                     await _startReceive(
                       parentContext,
@@ -247,11 +247,18 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       itemBuilder: (context, index) => Consumer<JobStateModel>(
         builder: (context, state, child) => NearbyCard(
           package: nearbyPackages[index].key,
-          onTap: () => _startReceive(
-            parentContext,
-            state,
-            nearbyPackages[index].key.code,
-          ),
+          onTap: () async {
+            if (state.isSendBusy) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(sendJobRunningSnackBar(context));
+            } else {
+              await _startReceive(
+                parentContext,
+                state,
+                nearbyPackages[index].key.code,
+              );
+            }
+          },
         ),
       ),
       separatorBuilder: (context, index) {
@@ -294,7 +301,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         builder: (context, state, child) {
           return FileCard(
             fileInfo: _files[index].info,
-            linearProgressIndicator: state.value == JobState.receiving
+            linearProgressIndicator: state.receiveState == JobState.running
                 ? LinearProgressIndicator(value: _files[index].writeProgress)
                 : null,
             onTap: _files[index].info.textData != null &&
@@ -327,15 +334,15 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   Widget _actionCard() {
     return Consumer<JobStateModel>(
       builder: (context, state, child) {
-        switch (state.value) {
-          case JobState.waitingForSenderToAccept:
+        switch (state.receiveState) {
+          case JobState.waiting:
             return _waitingStateActionCard(state);
-          case JobState.receiving:
+          case JobState.running:
             return _receivingStateActionCard(state);
-          case JobState.received:
+          case JobState.done:
             return _receivedStateActionCard(state);
           default:
-            throw AssertionError("cannot be ${state.value} state");
+            throw AssertionError("invalid state ${state.receiveState}");
         }
       },
     );
@@ -352,7 +359,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       onTrailingIconPressed: () async {
         await _receiveChannel.close();
         await WakelockPlus.disable();
-        state.value = JobState.ready;
+        state.receiveState = JobState.ready;
       },
     );
   }
@@ -373,7 +380,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             await _receiveChannel.close().then((_) {
               WakelockPlus.disable();
               _progressTimer?.cancel();
-              state.value = JobState.ready;
+              state.receiveState = JobState.ready;
               Navigator.pop(context);
             });
           } else {
@@ -400,7 +407,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         setState(() {
           _files.clear();
         });
-        state.value = JobState.ready;
+        state.receiveState = JobState.ready;
       },
       linearProgressIndicator: LinearProgressIndicator(
         value: _receiveChannel.receiveProgress,

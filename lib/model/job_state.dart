@@ -2,31 +2,30 @@ import 'package:flutter/material.dart';
 
 enum JobState {
   ready,
-  waitingForSenderToAccept,
-  receiving,
-  received,
-  waitingForReceiverToConnect,
-  sending,
-  sent,
+  waiting,
+  running,
+  done,
 }
 
 class JobStateModel extends ChangeNotifier {
-  JobState _state = JobState.ready;
+  JobState _receiveState = JobState.ready;
+  JobState _sendState = JobState.ready;
 
-  JobState get value => _state;
+  JobState get receiveState => _receiveState;
+  JobState get sendState => _sendState;
 
-  set value(JobState state) {
-    _state = state;
+  set receiveState(JobState state) {
+    _receiveState = state;
     notifyListeners();
   }
 
-  bool get isReceive =>
-      _state == JobState.waitingForSenderToAccept ||
-      _state == JobState.receiving ||
-      _state == JobState.received;
+  set sendState(JobState state) {
+    _sendState = state;
+    notifyListeners();
+  }
 
-  bool get isSend =>
-      _state == JobState.waitingForReceiverToConnect ||
-      _state == JobState.sending ||
-      _state == JobState.sent;
+  bool get isReceiveBusy =>
+      _receiveState == JobState.waiting || _receiveState == JobState.running;
+  bool get isSendBusy =>
+      _sendState == JobState.waiting || _sendState == JobState.running;
 }
