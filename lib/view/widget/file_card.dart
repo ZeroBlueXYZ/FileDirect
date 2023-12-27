@@ -11,6 +11,7 @@ class FileCard extends StatelessWidget {
   final void Function()? onTrailingIconPressed;
   final LinearProgressIndicator? linearProgressIndicator;
   final bool showPreview;
+  final void Function()? onTap;
 
   const FileCard({
     super.key,
@@ -19,6 +20,7 @@ class FileCard extends StatelessWidget {
     this.onTrailingIconPressed,
     this.linearProgressIndicator,
     this.showPreview = false,
+    this.onTap,
   });
 
   @override
@@ -36,6 +38,7 @@ class FileCard extends StatelessWidget {
                   onPressed: onTrailingIconPressed,
                 )
               : null,
+          onTap: onTap,
         ),
         if (linearProgressIndicator != null) linearProgressIndicator!,
       ]),

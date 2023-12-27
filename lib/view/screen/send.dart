@@ -17,6 +17,7 @@ import 'package:anysend/model/package.dart';
 import 'package:anysend/repository/package.dart';
 import 'package:anysend/util/file_helper.dart';
 import 'package:anysend/util/peer_channel/send_channel.dart';
+import 'package:anysend/view/screen/message.dart';
 import 'package:anysend/view/widget/action_card.dart';
 import 'package:anysend/view/widget/file_card.dart';
 import 'package:anysend/view/widget/warning.dart';
@@ -203,7 +204,19 @@ class _SendScreenState extends State<SendScreen> {
           _pickButton(
             icon: Icons.message,
             label: AppLocalizations.of(context)!.textSecureMessage,
-            onPressed: null,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MessageScreen(readOnly: false),
+                ),
+              ).then((fileInfo) {
+                if ((fileInfo as FileInfo?) != null) {
+                  _files.add(JobFile(info: fileInfo!));
+                  setState(() {});
+                }
+              });
+            },
           ),
         ],
       ),
@@ -240,7 +253,7 @@ class _SendScreenState extends State<SendScreen> {
             _files.clear();
           });
         },
-        child: Text(AppLocalizations.of(context)!.textDeleteAll),
+        child: Text(AppLocalizations.of(context)!.textRemoveAll),
       ),
     );
   }
@@ -258,6 +271,25 @@ class _SendScreenState extends State<SendScreen> {
               });
             },
             showPreview: true,
+            onTap: state.value == JobState.ready &&
+                    _files[index].info.textData != null
+                ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MessageScreen(
+                          readOnly: false,
+                          initialText: _files[index].info.textData,
+                        ),
+                      ),
+                    ).then((fileInfo) {
+                      if ((fileInfo as FileInfo?) != null) {
+                        _files[index] = JobFile(info: fileInfo!);
+                        setState(() {});
+                      }
+                    });
+                  }
+                : null,
           );
         },
       ),

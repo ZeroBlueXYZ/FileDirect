@@ -89,6 +89,13 @@ SnackBar canceledByPeerSnackBar(
   );
 }
 
+SnackBar savedToFileSnackBar(BuildContext context) {
+  return SnackBar(
+    content: Text(AppLocalizations.of(context)!.warningSavedToFile),
+    duration: const Duration(seconds: 3),
+  );
+}
+
 Widget confirmCancellationDialog(
   BuildContext context, {
   required void Function(bool) onPressed,

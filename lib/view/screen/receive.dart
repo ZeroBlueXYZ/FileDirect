@@ -16,6 +16,7 @@ import 'package:anysend/repository/package.dart';
 import 'package:anysend/util/file_helper.dart';
 import 'package:anysend/util/output_path_helper.dart';
 import 'package:anysend/util/peer_channel/receive_channel.dart';
+import 'package:anysend/view/screen/message.dart';
 import 'package:anysend/view/widget/action_card.dart';
 import 'package:anysend/view/widget/file_card.dart';
 import 'package:anysend/view/widget/nearby_card.dart';
@@ -41,8 +42,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   final GlobalKey<FormState> _codeFormKey = GlobalKey<FormState>();
 
-  final TextEditingController _codeTextEditingController =
-      TextEditingController();
+  late final TextEditingController _codeTextEditingController;
 
   List<JobFile> get _files => _receiveChannel.files;
 
@@ -141,8 +141,9 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   @override
   void initState() {
-    _refreshAnnounce();
     super.initState();
+    _codeTextEditingController = TextEditingController();
+    _refreshAnnounce();
   }
 
   @override
@@ -151,6 +152,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     _announceTimer?.cancel();
     _packageRepo.closeReceive();
     _receiveChannel.close();
+    _codeTextEditingController.dispose();
     super.dispose();
   }
 
@@ -296,6 +298,20 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             fileInfo: _files[index].info,
             linearProgressIndicator: state.value == JobState.receiving
                 ? LinearProgressIndicator(value: _files[index].writeProgress)
+                : null,
+            onTap: _files[index].info.textData != null &&
+                    _files[index].writeProgress == 1.0
+                ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MessageScreen(
+                          readOnly: true,
+                          initialText: _files[index].info.textData,
+                        ),
+                      ),
+                    );
+                  }
                 : null,
           );
         },
