@@ -20,7 +20,6 @@
   "textSecureMessage": "文本",
   "textConfirmCancel": "确认取消",
   "textEnterFilename": "输入文件名",
-  "textRemoveAll": "全部移除",
   "textExpiresIn": "到期",
   "textWaitForSenderToAccept": "等待发送方同意",
   "textEnterReceiveCodeFromSender": "输入6位数字分享码",

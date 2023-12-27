@@ -165,7 +165,7 @@ class _SendScreenState extends State<SendScreen> {
           children: [
             if (state.sendState == JobState.ready) _pickButtons(),
             if (state.sendState == JobState.ready && _files.isNotEmpty)
-              _deleteAllTile(),
+              _removeAllTile(),
             Expanded(child: _fileList()),
             if (_files.isNotEmpty) _actionCard(),
           ],
@@ -241,15 +241,15 @@ class _SendScreenState extends State<SendScreen> {
     );
   }
 
-  ListTile _deleteAllTile() {
+  ListTile _removeAllTile() {
     return ListTile(
-      trailing: TextButton(
+      trailing: IconButton(
         onPressed: () {
           setState(() {
             _files.clear();
           });
         },
-        child: Text(AppLocalizations.of(context)!.textRemoveAll),
+        icon: const Icon(Icons.delete_outline),
       ),
     );
   }
@@ -261,7 +261,7 @@ class _SendScreenState extends State<SendScreen> {
           return FileCard(
             fileInfo: _files[index].info,
             trailingIcon:
-                state.sendState == JobState.ready ? Icons.delete : null,
+                state.sendState == JobState.ready ? Icons.remove : null,
             onTrailingIconPressed: () {
               setState(() {
                 _files.removeAt(index);
