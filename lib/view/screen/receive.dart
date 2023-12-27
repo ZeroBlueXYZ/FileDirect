@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -68,75 +67,74 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     JobStateModel state,
     String code,
   ) async {
-    Directory? directory = await getOutputDirectory();
-    if (directory == null) {
-      if (mounted) {
+    await getOutputDirectory().then((directory) {
+      if (directory == null) {
         ScaffoldMessenger.of(context)
             .showSnackBar(unknownErrorSnackBar(context));
-      }
-      return;
-    }
-    _receiveChannel.outputDirectory = directory;
-    _files.clear();
+      } else {
+        _receiveChannel.outputDirectory = directory;
+        _files.clear();
 
-    final package = await _packageRepo.get(code: code);
-    if (package == null) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(invalidCodeSnackBar(context));
-      }
-    } else {
-      await WakelockPlus.enable();
-      await _receiveChannel.connect(
-        peerId: package.ownerId,
-        onFailure: (wasConnected) async {
-          ScaffoldMessenger.of(parentContext).showSnackBar(wasConnected
-              ? interruptedNetworkErrorSnackBar(parentContext, onPressed: () {})
-              : restrictedNetworkErrorSnackBar(parentContext,
-                  onPressed: () {}));
-          await _receiveChannel.close();
-          await WakelockPlus.disable();
-          _progressTimer?.cancel();
-          state.value = JobState.ready;
-        },
-        onDone: () async {
-          await _receiveChannel.close();
-          await WakelockPlus.disable();
-          _progressTimer?.cancel();
-          state.value = JobState.received;
-        },
-        onCancel: () async {
-          ScaffoldMessenger.of(parentContext)
-              .showSnackBar(canceledByPeerSnackBar(
-            parentContext,
-            onPressed: () {},
-          ));
-          await _receiveChannel.close();
-          await WakelockPlus.disable();
-          _progressTimer?.cancel();
-          state.value = JobState.ready;
-        },
-        onAcceptOrDeny: (accept) async {
-          if (accept) {
-            _progressTimer = Timer.periodic(progressPeriod, (timer) {
-              setState(() {});
-            });
-            state.value = JobState.receiving;
+        _packageRepo.get(code: code).then((package) async {
+          if (package == null) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(invalidCodeSnackBar(context));
           } else {
-            ScaffoldMessenger.of(parentContext)
-                .showSnackBar(deniedBySenderSnackBar(
-              parentContext,
-              onPressed: () {},
-            ));
-            await _receiveChannel.close();
-            await WakelockPlus.disable();
-            state.value = JobState.ready;
+            await WakelockPlus.enable();
+            await _receiveChannel.connect(
+              peerId: package.ownerId,
+              onFailure: (wasConnected) async {
+                ScaffoldMessenger.of(parentContext).showSnackBar(wasConnected
+                    ? interruptedNetworkErrorSnackBar(parentContext,
+                        onPressed: () {})
+                    : restrictedNetworkErrorSnackBar(parentContext,
+                        onPressed: () {}));
+                await _receiveChannel.close();
+                await WakelockPlus.disable();
+                _progressTimer?.cancel();
+                state.value = JobState.ready;
+              },
+              onDone: () async {
+                await _receiveChannel.close();
+                await WakelockPlus.disable();
+                _progressTimer?.cancel();
+                state.value = JobState.received;
+              },
+              onCancel: () async {
+                ScaffoldMessenger.of(parentContext)
+                    .showSnackBar(canceledByPeerSnackBar(
+                  parentContext,
+                  onPressed: () {},
+                ));
+                await _receiveChannel.close();
+                await WakelockPlus.disable();
+                _progressTimer?.cancel();
+                state.value = JobState.ready;
+              },
+              onAcceptOrDeny: (accept) async {
+                if (accept) {
+                  _progressTimer = Timer.periodic(progressPeriod, (timer) {
+                    setState(() {});
+                  });
+                  state.value = JobState.receiving;
+                } else {
+                  ScaffoldMessenger.of(parentContext)
+                      .showSnackBar(deniedBySenderSnackBar(
+                    parentContext,
+                    onPressed: () {},
+                  ));
+                  await _receiveChannel.close();
+                  await WakelockPlus.disable();
+                  state.value = JobState.ready;
+                }
+              },
+            );
+            await _receiveChannel.askToReceive(_name);
+            state.value = JobState.waitingForSenderToAccept;
           }
-        },
-      );
-      await _receiveChannel.askToReceive(_name);
-      state.value = JobState.waitingForSenderToAccept;
-    }
+        });
+      }
+    });
   }
 
   @override
@@ -227,7 +225,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                     ScaffoldMessenger.of(context)
                         .showSnackBar(ongoingTaskSnackBar(context));
                   } else {
-                    _startReceive(
+                    await _startReceive(
                       parentContext,
                       state,
                       _codeTextEditingController.text,
@@ -372,13 +370,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             confirmCancellationDialog(context, onPressed: (canceled) async {
           if (canceled) {
             _receiveChannel.sendCancelSignal();
-            await _receiveChannel.close();
-            await WakelockPlus.disable();
-            _progressTimer?.cancel();
-            state.value = JobState.ready;
-          }
-          if (mounted) {
-            Navigator.pop(context, canceled ? "canceled" : "not_canceled");
+            await _receiveChannel.close().then((_) {
+              WakelockPlus.disable();
+              _progressTimer?.cancel();
+              state.value = JobState.ready;
+              Navigator.pop(context);
+            });
+          } else {
+            Navigator.pop(context);
           }
         }),
       ),

@@ -281,10 +281,10 @@ abstract class PeerChannel {
   }
 
   Future<void> sendBinaryData(Uint8List data) async {
-    await _dataChannel!.send(RTCDataChannelMessage.fromBinary(data));
+    await _dataChannel?.send(RTCDataChannelMessage.fromBinary(data));
   }
 
   Future<void> sendTextData(String data) async {
-    await _dataChannel!.send(RTCDataChannelMessage(data));
+    await _dataChannel?.send(RTCDataChannelMessage(data));
   }
 }

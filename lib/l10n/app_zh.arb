@@ -34,7 +34,7 @@
   "warningInterruptedNetworkError": "和另一方的连接中断。",
   "warningOngoingTask": "请先等待进行中的任务完成。",
   "warningInvalidCode": "分享码不存在。",
-  "warningCodeCopiedToClipboard": "分享码已复制到剪贴板。",
+  "warningCopiedToClipboard": "已复制到剪贴板。",
   "warningDeniedBySender": "发送方拒绝了传输请求。",
   "warningCanceledByPeer": "另一方取消了传输。",
   "warningSavedToFile": "已保存到文件。",

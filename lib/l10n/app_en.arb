@@ -42,7 +42,7 @@
   "warningInterruptedNetworkError": "Peer connection was interrupted.",
   "warningOngoingTask": "Please wait for the ongoing task to complete first.",
   "warningInvalidCode": "Share code doesn't exist.",
-  "warningCodeCopiedToClipboard": "Share code has been copied to clipboard.",
+  "warningCopiedToClipboard": "Copied to clipboard.",
   "warningDeniedBySender": "Transfer request was denied by sender.",
   "warningCanceledByPeer": "Transfer was canceled by peer.",
   "warningSavedToFile": "Saved to file.",

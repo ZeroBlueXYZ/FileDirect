@@ -48,9 +48,9 @@ SnackBar invalidCodeSnackBar(BuildContext context) {
   );
 }
 
-SnackBar codeCopiedToClipboardSnackBar(BuildContext context) {
+SnackBar copiedToClipboardSnackBar(BuildContext context) {
   return SnackBar(
-    content: Text(AppLocalizations.of(context)!.warningCodeCopiedToClipboard),
+    content: Text(AppLocalizations.of(context)!.warningCopiedToClipboard),
     duration: const Duration(seconds: 3),
   );
 }
