@@ -42,12 +42,6 @@ SnackBar ongoingTaskSnackBar(BuildContext context) {
   );
 }
 
-SnackBar storagePermissionErrorSnackBar(BuildContext context) {
-  return SnackBar(
-    content: Text(AppLocalizations.of(context)!.warningStoragePermissionError),
-  );
-}
-
 SnackBar invalidCodeSnackBar(BuildContext context) {
   return SnackBar(
     content: Text(AppLocalizations.of(context)!.warningInvalidCode),

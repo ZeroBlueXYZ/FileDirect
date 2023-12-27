@@ -191,15 +191,9 @@ class _SendScreenState extends State<SendScreen> {
             ),
           if (Platform.isAndroid || Platform.isIOS)
             _pickButton(
-              icon: Icons.image,
-              label: AppLocalizations.of(context)!.textImage,
-              onPressed: () => _pickFiles(type: FileType.image),
-            ),
-          if (Platform.isAndroid || Platform.isIOS)
-            _pickButton(
-              icon: Icons.video_file,
-              label: AppLocalizations.of(context)!.textVideo,
-              onPressed: () => _pickFiles(type: FileType.video),
+              icon: Icons.photo,
+              label: AppLocalizations.of(context)!.textPhoto,
+              onPressed: () => _pickFiles(type: FileType.media),
             ),
           _pickButton(
             icon: Icons.message,
