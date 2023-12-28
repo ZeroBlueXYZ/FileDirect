@@ -30,7 +30,11 @@ class FileCard extends StatelessWidget {
       child: Column(children: [
         ListTile(
           leading: _leading(),
-          title: Text(fileInfo.name, overflow: TextOverflow.ellipsis),
+          title: Text(
+            fileInfo.name,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
           subtitle: Text(fileInfo.size.readableFileSize()),
           trailing: trailingIcon != null
               ? IconButton(
