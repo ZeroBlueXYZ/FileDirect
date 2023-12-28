@@ -7,20 +7,16 @@ import 'package:anysend/util/file_helper.dart';
 
 class FileCard extends StatelessWidget {
   final FileInfo fileInfo;
-  final IconData? trailingIcon;
-  final void Function()? onTrailingIconPressed;
+  final Widget? trailing;
   final LinearProgressIndicator? linearProgressIndicator;
   final bool showPreview;
-  final void Function()? onTap;
 
   const FileCard({
     super.key,
     required this.fileInfo,
-    this.trailingIcon,
-    this.onTrailingIconPressed,
+    this.trailing,
     this.linearProgressIndicator,
     this.showPreview = false,
-    this.onTap,
   });
 
   @override
@@ -36,13 +32,7 @@ class FileCard extends StatelessWidget {
             maxLines: 1,
           ),
           subtitle: Text(fileInfo.size.readableFileSize()),
-          trailing: trailingIcon != null
-              ? IconButton(
-                  icon: Icon(trailingIcon),
-                  onPressed: onTrailingIconPressed,
-                )
-              : null,
-          onTap: onTap,
+          trailing: trailing,
         ),
         if (linearProgressIndicator != null) linearProgressIndicator!,
       ]),

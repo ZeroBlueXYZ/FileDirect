@@ -260,33 +260,41 @@ class _SendScreenState extends State<SendScreen> {
         builder: (context, state, child) {
           return FileCard(
             fileInfo: _files[index].info,
-            trailingIcon:
-                state.sendState == JobState.ready ? Icons.remove : null,
-            onTrailingIconPressed: () {
-              setState(() {
-                _files.removeAt(index);
-              });
-            },
-            showPreview: true,
-            onTap: state.sendState == JobState.ready &&
-                    _files[index].info.textData != null
-                ? () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MessageScreen(
-                          readOnly: false,
-                          initialText: _files[index].info.textData,
+            trailing: state.sendState == JobState.ready
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_files[index].info.textData != null)
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MessageScreen(
+                                  readOnly: false,
+                                  initialText: _files[index].info.textData,
+                                ),
+                              ),
+                            ).then((fileInfo) {
+                              if ((fileInfo as FileInfo?) != null) {
+                                _files[index] = JobFile(info: fileInfo!);
+                                setState(() {});
+                              }
+                            });
+                          },
+                          icon: const Icon(Icons.edit),
                         ),
-                      ),
-                    ).then((fileInfo) {
-                      if ((fileInfo as FileInfo?) != null) {
-                        _files[index] = JobFile(info: fileInfo!);
-                        setState(() {});
-                      }
-                    });
-                  }
+                      IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _files.removeAt(index);
+                            });
+                          },
+                          icon: const Icon(Icons.remove))
+                    ],
+                  )
                 : null,
+            showPreview: true,
           );
         },
       ),
