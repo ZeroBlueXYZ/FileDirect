@@ -168,10 +168,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         builder: (context, state, child) => state.receiveState == JobState.ready
             ? _readyStateWidget(context)
             : Column(children: [
-                if (state.receiveState == JobState.done) _fileLocationButton(),
                 if (state.receiveState == JobState.running ||
                     state.receiveState == JobState.done)
                   _toolbar(),
+                if (state.receiveState == JobState.done) _fileLocationButton(),
                 Expanded(child: _fileList()),
                 _actionCard(),
               ]),
