@@ -6,7 +6,7 @@ FileDirect is a free and open-source app that helps you share and receives files
 
 ## Screenshots
 
-<img src="assets/screenshot/mobile.png" alt="mobile" height="400"/> <img src="assets/screenshot/desktop.png" alt="mobile" height="400"/>
+<img src="assets/screenshot/mobile.png" alt="mobile" height="300"/> <img src="assets/screenshot/desktop.png" alt="mobile" height="300"/>
 
 ## Contribution
 
