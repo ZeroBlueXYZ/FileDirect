@@ -43,22 +43,40 @@ class _SendScreenState extends State<SendScreen> {
   Timer? _progressTimer;
 
   void _pickFiles({FileType type = FileType.any}) async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: SizedBox.square(
+            dimension: 60,
+            child: CircularProgressIndicator(),
+          ),
+        );
+      },
+      barrierDismissible: false,
+    );
+    await FilePicker.platform
+        .pickFiles(
       type: type,
       allowMultiple: true,
-    );
-    if (result != null) {
-      for (final file in result.files) {
-        _files.add(JobFile(
-          info: FileInfo(
-            name: file.name,
-            size: file.size,
-            path: file.path,
-          ),
-        ));
+    )
+        .then((result) {
+      Navigator.pop(context);
+      if (result != null) {
+        for (final file in result.files) {
+          _files.add(JobFile(
+            info: FileInfo(
+              name: file.name,
+              size: file.size,
+              path: file.path,
+            ),
+          ));
+        }
+        setState(() {});
       }
-      setState(() {});
-    }
+    }).onError((error, stackTrace) {
+      Navigator.pop(context);
+    });
   }
 
   void _pickDirectory() async {
