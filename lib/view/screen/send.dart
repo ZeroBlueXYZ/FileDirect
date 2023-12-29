@@ -43,18 +43,23 @@ class _SendScreenState extends State<SendScreen> {
   Timer? _progressTimer;
 
   void _pickFiles({FileType type = FileType.any}) async {
-    showDialog(
-      context: context,
-      builder: (context) => _loadingDialog(),
-      barrierDismissible: false,
-    );
+    final bool showLoading = Platform.isAndroid || Platform.isIOS;
+    if (showLoading) {
+      showDialog(
+        context: context,
+        builder: (context) => _loadingDialog(),
+        barrierDismissible: false,
+      );
+    }
     await FilePicker.platform
         .pickFiles(
       type: type,
       allowMultiple: true,
     )
         .then((result) {
-      Navigator.pop(context);
+      if (showLoading) {
+        Navigator.pop(context);
+      }
       if (result != null) {
         for (final file in result.files) {
           _files.add(JobFile(
@@ -68,7 +73,9 @@ class _SendScreenState extends State<SendScreen> {
         setState(() {});
       }
     }).onError((error, stackTrace) {
-      Navigator.pop(context);
+      if (showLoading) {
+        Navigator.pop(context);
+      }
     });
   }
 
