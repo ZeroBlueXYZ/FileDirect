@@ -30,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(
           children: [
             _navigationRail(),
-            const VerticalDivider(),
             Expanded(
               child: Container(
                 alignment: Alignment.center,
@@ -76,6 +75,9 @@ class _HomeScreenState extends State<HomeScreen> {
           _navigationItemIndex = value;
         });
       },
+      backgroundColor:
+          Theme.of(context).colorScheme.surfaceVariant.withAlpha(80),
+      indicatorColor: Theme.of(context).colorScheme.surfaceVariant,
     );
   }
 
