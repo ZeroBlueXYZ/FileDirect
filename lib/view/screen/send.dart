@@ -31,7 +31,7 @@ class SendScreen extends StatefulWidget {
 
 class _SendScreenState extends State<SendScreen> {
   static const Duration announcePeriod = Duration(seconds: 1);
-  static const Duration progressPeriod = Duration(milliseconds: 500);
+  static const Duration progressPeriod = Duration(seconds: 1);
 
   final PackageRepository _packageRepo = PackageRepository();
   final SendChannel _sendChannel = SendChannel();

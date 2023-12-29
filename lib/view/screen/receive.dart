@@ -31,7 +31,7 @@ class ReceiveScreen extends StatefulWidget {
 class _ReceiveScreenState extends State<ReceiveScreen> {
   static const Duration announcePeriod = Duration(seconds: 1);
   static const Duration announceTtl = Duration(seconds: 4);
-  static const Duration progressPeriod = Duration(milliseconds: 500);
+  static const Duration progressPeriod = Duration(seconds: 1);
 
   final PackageRepository _packageRepo = PackageRepository();
   final ReceiveChannel _receiveChannel = ReceiveChannel();

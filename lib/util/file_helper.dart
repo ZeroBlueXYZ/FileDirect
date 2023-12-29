@@ -1,5 +1,5 @@
 extension ReadableFileSize on num {
-  String readableFileSize({bool base1000 = false}) {
+  String readableFileSize({bool base1000 = true}) {
     num divider = base1000 ? 1000 : 1024;
     if (this < divider) {
       return '${toStringAsFixed(0)} B';
