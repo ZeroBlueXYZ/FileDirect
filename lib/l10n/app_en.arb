@@ -24,8 +24,6 @@
   "textExpiresIn": "Expires in",
   "textWaitForSenderToAccept": "Waiting for sender to accept",
   "textEnterReceiveCodeFromSender": "Enter 6 digit share code",
-  "textShareCode": "Share Code",
-  "textNearby": "Nearby",
   "textReceviedFileLocationQuestion": "Where are received files?",
   "textReceviedFileLocationAnswer": "IOS: App folder\nOther Platforms: Downloads folder",
   "textRequestForReceive": "{name}\nrequests to receive data",

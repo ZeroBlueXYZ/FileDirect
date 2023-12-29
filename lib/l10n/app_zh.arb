@@ -24,8 +24,6 @@
   "textExpiresIn": "到期",
   "textWaitForSenderToAccept": "等待发送方同意",
   "textEnterReceiveCodeFromSender": "输入6位数字分享码",
-  "textShareCode": "分享码",
-  "textNearby": "附近的",
   "textReceviedFileLocationQuestion": "收到的文件在哪里？",
   "textReceviedFileLocationAnswer": "IOS: 应用文件夹\n其他平台: 下载文件夹",
   "textRequestForReceive": "{name}\n请求接收数据",

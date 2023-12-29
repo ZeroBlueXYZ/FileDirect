@@ -75,10 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
         alignment: Alignment.bottomCenter,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: _showAboutDialog,
-          ),
+          child: _aboutIconButton(),
         ),
       )),
       labelType: NavigationRailLabelType.all,
@@ -98,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return AppBar(
       title: TextButton.icon(
         onPressed: null,
-        icon: const Image(image: GlobalConfig.appIcon, width: 30),
+        icon: const Image(image: GlobalConfig.appIcon, width: 28),
         label: Text(
           AppLocalizations.of(context)!.appName,
           style: Theme.of(context).textTheme.titleLarge,
@@ -106,10 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       centerTitle: false,
       actions: [
-        IconButton(
-          onPressed: _showAboutDialog,
-          icon: const Icon(Icons.info_outline),
-        ),
+        _aboutIconButton(),
       ],
     );
   }
@@ -150,18 +144,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _showAboutDialog() async {
-    showDialog(
-      context: context,
-      builder: (context) => AboutDialog(
-        applicationName: AppLocalizations.of(context)!.appName,
-        applicationVersion: GlobalConfig().version,
-        applicationIcon: const Image(image: GlobalConfig.appIcon, width: 80),
-        applicationLegalese: GlobalConfig().copyright,
-        children: [
-          const Divider(height: 20, color: Colors.transparent),
-          Text(AppLocalizations.of(context)!.appDescription),
-        ],
+  IconButton _aboutIconButton() {
+    return IconButton(
+      icon: const Icon(Icons.info_outline),
+      onPressed: () => showDialog(
+        context: context,
+        builder: (context) => AboutDialog(
+          applicationName: AppLocalizations.of(context)!.appName,
+          applicationVersion: GlobalConfig().version,
+          applicationIcon: const Image(image: GlobalConfig.appIcon, width: 80),
+          applicationLegalese: GlobalConfig().copyright,
+          children: [
+            const Divider(height: 20, color: Colors.transparent),
+            Text(AppLocalizations.of(context)!.appDescription),
+          ],
+        ),
       ),
     );
   }

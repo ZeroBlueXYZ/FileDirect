@@ -55,7 +55,7 @@ class GlobalConfig {
   }
 }
 
-const String _copyright = 'Copyright 2023 Zhaoming Zhang';
+const String _copyright = 'Copyright © 2023 Zhaoming Zhang';
 const String _license = '''
                                  Apache License
                            Version 2.0, January 2004

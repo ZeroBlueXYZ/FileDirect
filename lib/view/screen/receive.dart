@@ -183,21 +183,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(
-            AppLocalizations.of(context)!.textShareCode,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
         _codeForm(parentContext),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(
-            AppLocalizations.of(context)!.textNearby,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
+        const Divider(height: 20, color: Colors.transparent),
         Expanded(child: _nearbyList(parentContext)),
       ],
     );
