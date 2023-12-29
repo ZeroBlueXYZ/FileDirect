@@ -6,6 +6,8 @@ import 'package:anysend/model/file.dart';
 import 'package:anysend/util/file_helper.dart';
 
 class FileCard extends StatelessWidget {
+  static const double leadingIconSize = 28;
+
   final FileInfo fileInfo;
   final Widget? trailing;
   final LinearProgressIndicator? linearProgressIndicator;
@@ -40,24 +42,28 @@ class FileCard extends StatelessWidget {
   }
 
   Widget _leading() {
-    if (fileInfo.textData == null) {
-      if (fileInfo.name.isImage()) {
-        if (showPreview) {
-          return Image.file(
-            File(fileInfo.path!),
-            errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.image),
-          );
-        } else {
-          return const Icon(Icons.image);
-        }
-      } else if (fileInfo.name.isVideo()) {
-        return const Icon(Icons.video_file);
-      } else {
-        return const Icon(Icons.description);
+    final IconData iconData = () {
+      switch (fileInfo.type) {
+        case FileInfoType.message:
+          return Icons.message;
+        case FileInfoType.image:
+          return Icons.image;
+        case FileInfoType.video:
+          return Icons.video_file;
+        default:
+          return Icons.description;
       }
+    }();
+    final Icon icon = Icon(iconData, size: leadingIconSize);
+
+    if (showPreview && fileInfo.type == FileInfoType.image) {
+      return Image.file(
+        File(fileInfo.path!),
+        errorBuilder: (context, error, stackTrace) => icon,
+        width: leadingIconSize,
+      );
     } else {
-      return const Icon(Icons.message);
+      return icon;
     }
   }
 }
