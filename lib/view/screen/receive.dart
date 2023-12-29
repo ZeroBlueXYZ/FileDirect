@@ -214,7 +214,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
               controller: _codeTextEditingController,
               decoration: InputDecoration(
                 border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(32))),
+                    borderRadius: BorderRadius.all(Radius.circular(30))),
                 hintText: AppLocalizations.of(context)!
                     .textEnterReceiveCodeFromSender,
                 errorStyle: const TextStyle(fontSize: 0),
@@ -225,8 +225,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                       ? null
                       : "",
             ),
-            trailing: IconButton.filledTonal(
-              icon: const Icon(Icons.arrow_forward, size: 28),
+            trailing: IconButton.outlined(
+              icon: const Icon(Icons.navigate_next, size: 30),
               onPressed: () async {
                 if (_codeFormKey.currentState != null &&
                     _codeFormKey.currentState!.validate()) {
