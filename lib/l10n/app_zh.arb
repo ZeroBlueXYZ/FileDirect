@@ -1,5 +1,6 @@
 {
   "appName": "FileDirect",
+  "appDescription": "与附近的或远程的设备共享文件",
   "textSend": "发送",
   "textReceive": "接收",
   "textOk": "好的",

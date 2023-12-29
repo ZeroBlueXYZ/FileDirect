@@ -5,7 +5,7 @@ import 'package:anysend/util/global_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  GlobalConfig().ensureInit();
+  await GlobalConfig().ensureInit();
 
   runApp(const App());
 }

@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'package:anysend/model/job_state.dart';
+import 'package:anysend/util/global_config.dart';
 import 'package:anysend/view/screen/receive.dart';
 import 'package:anysend/view/screen/send.dart';
 
@@ -47,6 +48,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Scaffold _verticalHome() {
     return Scaffold(
+      appBar: AppBar(
+        title: TextButton.icon(
+          onPressed: null,
+          icon: const Image(image: GlobalConfig.appIcon, width: 30),
+          label: Text(
+            AppLocalizations.of(context)!.appName,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+        centerTitle: false,
+        actions: [
+          IconButton(
+            onPressed: _showAboutDialog,
+            icon: const Icon(Icons.info_outline),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: _indexedStack(),
       ),
@@ -68,6 +86,17 @@ class _HomeScreenState extends State<HomeScreen> {
           label: Text(AppLocalizations.of(context)!.textReceive),
         ),
       ],
+      trailing: Expanded(
+          child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: _showAboutDialog,
+          ),
+        ),
+      )),
       labelType: NavigationRailLabelType.all,
       selectedIndex: _navigationItemIndex,
       onDestinationSelected: (value) {
@@ -112,6 +141,20 @@ class _HomeScreenState extends State<HomeScreen> {
         children: const [
           SendScreen(),
           ReceiveScreen(),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showAboutDialog() async {
+    showDialog(
+      context: context,
+      builder: (context) => AboutDialog(
+        applicationName: AppLocalizations.of(context)!.appName,
+        applicationIcon: const Image(image: GlobalConfig.appIcon, width: 60),
+        applicationVersion: GlobalConfig().version,
+        children: [
+          Text(AppLocalizations.of(context)!.appDescription),
         ],
       ),
     );
