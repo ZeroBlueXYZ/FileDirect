@@ -155,9 +155,11 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) => AboutDialog(
         applicationName: AppLocalizations.of(context)!.appName,
-        applicationIcon: const Image(image: GlobalConfig.appIcon, width: 60),
         applicationVersion: GlobalConfig().version,
+        applicationIcon: const Image(image: GlobalConfig.appIcon, width: 80),
+        applicationLegalese: GlobalConfig().copyright,
         children: [
+          const Divider(height: 20, color: Colors.transparent),
           Text(AppLocalizations.of(context)!.appDescription),
         ],
       ),

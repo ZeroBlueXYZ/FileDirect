@@ -19,6 +19,8 @@ class GlobalConfig {
   late final String version;
   AuthToken? authToken;
 
+  String get copyright => _copyright;
+
   Future<void> ensureInit() async {
     initServerUri();
     await initPackageInfo();
@@ -53,6 +55,7 @@ class GlobalConfig {
   }
 }
 
+const String _copyright = 'Copyright 2023 Zhaoming Zhang';
 const String _license = '''
                                  Apache License
                            Version 2.0, January 2004
@@ -242,7 +245,7 @@ const String _license = '''
       same "printed page" as the copyright notice for easier
       identification within third-party archives.
 
-   Copyright 2023 Zhaoming Zhang
+   $_copyright
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
