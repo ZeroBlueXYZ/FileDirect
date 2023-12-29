@@ -199,7 +199,7 @@ class _SendScreenState extends State<SendScreen> {
             ),
           _pickButton(
             icon: Icons.message,
-            label: AppLocalizations.of(context)!.textSecureMessage,
+            label: AppLocalizations.of(context)!.textMessage,
             onPressed: () {
               Navigator.push(
                 context,
