@@ -17,6 +17,7 @@
   "textPhoto": "照片",
   "textImage": "图片",
   "textVideo": "视频",
+  "textMessage": "文本",
   "textSecureMessage": "文本",
   "textConfirmCancel": "确认取消",
   "textEnterFilename": "输入文件名",

@@ -236,7 +236,7 @@ class _SendScreenState extends State<SendScreen> {
         ),
         icon: Icon(icon),
         onPressed: onPressed,
-        label: Text(label),
+        label: Text(label, maxLines: 1),
       ),
     );
   }

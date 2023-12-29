@@ -309,9 +309,9 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       leading: Wrap(
         spacing: 5,
         children: [
-          (FileInfoType.image, "Image"),
-          (FileInfoType.video, "Video"),
-          (FileInfoType.message, "message")
+          (FileInfoType.image, AppLocalizations.of(context)!.textImage),
+          (FileInfoType.video, AppLocalizations.of(context)!.textVideo),
+          (FileInfoType.message, AppLocalizations.of(context)!.textMessage),
         ]
             .map((item) => ChoiceChip(
                 label: Text(item.$2),
