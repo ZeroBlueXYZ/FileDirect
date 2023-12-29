@@ -152,20 +152,14 @@ class ReceiveChannel extends PeerChannel {
       if (chunk.offset > file.writeOffset) {
         break;
       } else if (chunk.offset == file.writeOffset) {
-        await file.openWrite();
         await file.write(_buffer.removeFirst().data);
 
-        if (file.requestedOffset < file.info.size &&
-            file.writeOffset % maxBatchSizeInBytes == 0) {
-          int start = file.requestedOffset;
-          file.requestedOffset =
-              min(file.info.size, file.requestedOffset + maxBatchSizeInBytes);
-          await _sendGetChunk(chunk.fileId, start, file.requestedOffset);
-        } else if (file.writeOffset == file.info.size) {
+        if (file.writeOffset == file.info.size) {
           await file.closeWrite();
           int nextFileId = _nextFileId(chunk.fileId);
           if (nextFileId < _files.length) {
             JobFile nextFile = _files[nextFileId];
+            await nextFile.openWrite();
             nextFile.requestedOffset =
                 min(nextFile.info.size, maxBufferSizeInBytes);
             await _sendGetChunk(nextFileId, 0, nextFile.requestedOffset);
@@ -173,6 +167,12 @@ class ReceiveChannel extends PeerChannel {
             sendSignal(type: SignalTypes.done);
             onDone?.call();
           }
+        } else if (file.requestedOffset < file.info.size &&
+            file.writeOffset % maxBatchSizeInBytes == 0) {
+          int start = file.requestedOffset;
+          file.requestedOffset =
+              min(file.info.size, file.requestedOffset + maxBatchSizeInBytes);
+          await _sendGetChunk(chunk.fileId, start, file.requestedOffset);
         }
       } else {
         _buffer.removeFirst(); // duplicate chunk
@@ -233,6 +233,7 @@ class ReceiveChannel extends PeerChannel {
       int nextFileId = _nextFileId(-1);
       if (nextFileId < _files.length) {
         JobFile file = _files[nextFileId];
+        await file.openWrite();
         file.requestedOffset = min(file.info.size, maxBufferSizeInBytes);
         await _sendGetChunk(nextFileId, 0, file.requestedOffset);
       } else {
