@@ -44,6 +44,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   late final TextEditingController _codeTextEditingController;
 
   List<JobFile> get _files => _receiveChannel.files;
+  List<JobFile> get _filteredFiles => _files
+      .where((file) =>
+          _selectedFileType == FileInfoType.other ||
+          file.info.type == _selectedFileType)
+      .toList();
+  FileInfoType _selectedFileType = FileInfoType.other;
 
   Timer? _announceTimer;
   Timer? _progressTimer;
@@ -163,6 +169,9 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             ? _readyStateWidget(context)
             : Column(children: [
                 if (state.receiveState == JobState.done) _fileLocationButton(),
+                if (state.receiveState == JobState.running ||
+                    state.receiveState == JobState.done)
+                  _toolbar(),
                 Expanded(child: _fileList()),
                 _actionCard(),
               ]),
@@ -295,17 +304,40 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     );
   }
 
+  ListTile _toolbar() {
+    return ListTile(
+      leading: Wrap(
+        spacing: 5,
+        children: [
+          (FileInfoType.image, "Image"),
+          (FileInfoType.video, "Video"),
+          (FileInfoType.message, "message")
+        ]
+            .map((item) => ChoiceChip(
+                label: Text(item.$2),
+                selected: _selectedFileType == item.$1,
+                onSelected: (selected) {
+                  setState(() {
+                    _selectedFileType = selected ? item.$1 : FileInfoType.other;
+                  });
+                }))
+            .toList(),
+      ),
+    );
+  }
+
   ListView _fileList() {
     return ListView.separated(
       itemBuilder: (context, index) => Consumer<JobStateModel>(
         builder: (context, state, child) {
+          final file = _filteredFiles[index];
           return FileCard(
-            fileInfo: _files[index].info,
+            fileInfo: file.info,
             linearProgressIndicator: state.receiveState == JobState.running
-                ? LinearProgressIndicator(value: _files[index].writeProgress)
+                ? LinearProgressIndicator(value: file.writeProgress)
                 : null,
-            trailing: _files[index].info.textData != null &&
-                    _files[index].writeProgress == 1.0
+            trailing: file.info.type == FileInfoType.message &&
+                    file.writeProgress == 1.0
                 ? IconButton(
                     onPressed: () {
                       Navigator.push(
@@ -313,7 +345,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                         MaterialPageRoute(
                           builder: (context) => MessageScreen(
                             readOnly: true,
-                            initialText: _files[index].info.textData,
+                            initialText: file.info.textData,
                           ),
                         ),
                       );
@@ -330,7 +362,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           color: Colors.transparent,
         );
       },
-      itemCount: _files.length,
+      itemCount: _filteredFiles.length,
     );
   }
 

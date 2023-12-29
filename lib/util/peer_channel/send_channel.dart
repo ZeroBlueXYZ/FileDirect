@@ -150,7 +150,7 @@ class SendChannel extends PeerChannel {
     // mark text messages complete
     for (int index = req.page; index < end; index++) {
       final file = _files[index];
-      if (file.info.textData != null) {
+      if (file.info.type == FileInfoType.message) {
         file.markReadComplete();
         _timeoutWindow.add(file.info.size.toDouble());
       }

@@ -223,7 +223,7 @@ class ReceiveChannel extends PeerChannel {
     } else {
       // mark text messages complete
       for (final file in _files) {
-        if (file.info.textData != null) {
+        if (file.info.type == FileInfoType.message) {
           file.markWriteComplete();
           _timeoutWindow.add(file.info.size.toDouble());
         }

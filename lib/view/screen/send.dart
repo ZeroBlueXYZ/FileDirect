@@ -165,7 +165,7 @@ class _SendScreenState extends State<SendScreen> {
           children: [
             if (state.sendState == JobState.ready) _pickButtons(),
             if (state.sendState == JobState.ready && _files.isNotEmpty)
-              _removeAllTile(),
+              _toolbar(),
             Expanded(child: _fileList()),
             if (_files.isNotEmpty) _actionCard(),
           ],
@@ -241,7 +241,7 @@ class _SendScreenState extends State<SendScreen> {
     );
   }
 
-  ListTile _removeAllTile() {
+  ListTile _toolbar() {
     return ListTile(
       trailing: IconButton(
         onPressed: () {

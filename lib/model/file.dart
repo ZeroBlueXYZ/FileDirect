@@ -4,7 +4,16 @@ import 'dart:typed_data';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as path;
 
+import 'package:anysend/util/file_helper.dart';
+
 part 'file.g.dart';
+
+enum FileInfoType {
+  message,
+  image,
+  video,
+  other,
+}
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class FileInfo {
@@ -17,6 +26,18 @@ class FileInfo {
   String? textData; // for text
 
   String? path; // for file
+
+  FileInfoType get type {
+    if (textData != null) {
+      return FileInfoType.message;
+    } else if (name.isImage()) {
+      return FileInfoType.image;
+    } else if (name.isVideo()) {
+      return FileInfoType.video;
+    } else {
+      return FileInfoType.other;
+    }
+  }
 
   FileInfo({
     required this.name,
