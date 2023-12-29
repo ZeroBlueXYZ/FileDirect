@@ -48,23 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Scaffold _verticalHome() {
     return Scaffold(
-      appBar: AppBar(
-        title: TextButton.icon(
-          onPressed: null,
-          icon: const Image(image: GlobalConfig.appIcon, width: 30),
-          label: Text(
-            AppLocalizations.of(context)!.appName,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-        ),
-        centerTitle: false,
-        actions: [
-          IconButton(
-            onPressed: _showAboutDialog,
-            icon: const Icon(Icons.info_outline),
-          ),
-        ],
-      ),
+      appBar: _appBar(),
       body: SafeArea(
         child: _indexedStack(),
       ),
@@ -107,6 +91,26 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor:
           Theme.of(context).colorScheme.surfaceVariant.withAlpha(80),
       indicatorColor: Theme.of(context).colorScheme.surfaceVariant,
+    );
+  }
+
+  AppBar _appBar() {
+    return AppBar(
+      title: TextButton.icon(
+        onPressed: null,
+        icon: const Image(image: GlobalConfig.appIcon, width: 30),
+        label: Text(
+          AppLocalizations.of(context)!.appName,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+      ),
+      centerTitle: false,
+      actions: [
+        IconButton(
+          onPressed: _showAboutDialog,
+          icon: const Icon(Icons.info_outline),
+        ),
+      ],
     );
   }
 
