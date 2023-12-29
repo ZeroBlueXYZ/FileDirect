@@ -45,14 +45,7 @@ class _SendScreenState extends State<SendScreen> {
   void _pickFiles({FileType type = FileType.any}) async {
     showDialog(
       context: context,
-      builder: (context) {
-        return const Center(
-          child: SizedBox.square(
-            dimension: 60,
-            child: CircularProgressIndicator(),
-          ),
-        );
-      },
+      builder: (context) => _loadingDialog(),
       barrierDismissible: false,
     );
     await FilePicker.platform
@@ -493,6 +486,15 @@ class _SendScreenState extends State<SendScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _loadingDialog() {
+    return const Center(
+      child: SizedBox.square(
+        dimension: 60,
+        child: CircularProgressIndicator(),
       ),
     );
   }
