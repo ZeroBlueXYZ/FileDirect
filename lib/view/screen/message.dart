@@ -69,7 +69,6 @@ class _MessageScreenState extends State<MessageScreen> {
   AppBar _appBar() {
     return AppBar(
       title: Text(AppLocalizations.of(context)!.textMessage),
-      centerTitle: true,
       actions: widget.readOnly
           ? [
               IconButton(

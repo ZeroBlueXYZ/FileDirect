@@ -25,7 +25,6 @@ class HelpScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.helpTitle),
-        centerTitle: true,
       ),
       body: SafeArea(
         child: Padding(
