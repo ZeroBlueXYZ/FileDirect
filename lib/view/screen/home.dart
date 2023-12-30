@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:anysend/model/job_state.dart';
 import 'package:anysend/util/global_config.dart';
+import 'package:anysend/view/screen/help.dart';
 import 'package:anysend/view/screen/receive.dart';
 import 'package:anysend/view/screen/send.dart';
 
@@ -74,8 +75,14 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Align(
         alignment: Alignment.bottomCenter,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: _aboutIconButton(),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _infoIconButton(),
+              _helpIconButton(),
+            ],
+          ),
         ),
       )),
       labelType: NavigationRailLabelType.all,
@@ -103,7 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       centerTitle: false,
       actions: [
-        _aboutIconButton(),
+        _infoIconButton(),
+        _helpIconButton(),
       ],
     );
   }
@@ -144,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  IconButton _aboutIconButton() {
+  IconButton _infoIconButton() {
     return IconButton(
       icon: const Icon(Icons.info_outline),
       onPressed: () => showDialog(
@@ -158,6 +166,18 @@ class _HomeScreenState extends State<HomeScreen> {
             const Divider(height: 20, color: Colors.transparent),
             Text(AppLocalizations.of(context)!.appDescription),
           ],
+        ),
+      ),
+    );
+  }
+
+  IconButton _helpIconButton() {
+    return IconButton(
+      icon: const Icon(Icons.help_outline),
+      onPressed: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HelpScreen(),
         ),
       ),
     );

@@ -171,7 +171,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                 if (state.receiveState == JobState.running ||
                     state.receiveState == JobState.done)
                   _toolbar(),
-                if (state.receiveState == JobState.done) _fileLocationButton(),
                 Expanded(child: _fileList()),
                 _actionCard(),
               ]),
@@ -264,30 +263,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         );
       },
       itemCount: nearbyPackages.length,
-    );
-  }
-
-  TextButton _fileLocationButton() {
-    return TextButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            content: Text(
-                AppLocalizations.of(context)!.textReceviedFileLocationAnswer),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(AppLocalizations.of(context)!.textOk),
-              ),
-            ],
-          ),
-        );
-      },
-      child:
-          Text(AppLocalizations.of(context)!.textReceviedFileLocationQuestion),
     );
   }
 

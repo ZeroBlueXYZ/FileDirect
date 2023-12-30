@@ -24,8 +24,6 @@
   "textExpiresIn": "到期",
   "textWaitForSenderToAccept": "等待发送方同意",
   "textEnterReceiveCodeFromSender": "输入6位数字分享码",
-  "textReceviedFileLocationQuestion": "收到的文件在哪里？",
-  "textReceviedFileLocationAnswer": "IOS: 应用文件夹\n其他平台: 下载文件夹",
   "textRequestForReceive": "{name}\n请求接收数据",
   "warningUnknownError": "出了未知问题。",
   "warningRestrictedNetworkError": "和另一方建立连接失败。请检查您的防火墙设置或使用不同的网络。",
@@ -37,5 +35,12 @@
   "warningDeniedBySender": "发送方拒绝了传输请求。",
   "warningCanceledByPeer": "另一方取消了传输。",
   "warningSavedToFile": "已保存到文件。",
-  "fileCount": "{count, plural, =0{0 个文件} =1{1 个文件} other{{count} 个文件}}"
+  "fileCount": "{count, plural, =0{0 个文件} =1{1 个文件} other{{count} 个文件}}",
+  "helpTitle": "常见问题",
+  "helpQuestionFileLocation":"接收到的文件在哪里？",
+  "helpAnswerFileLocation": "在 IOS 上，接收到的文件存储在应用文件夹中；在其他平台上，则存储在下载文件夹中。",
+  "helpQuestionDataSecurity":"我的数据安全吗？",
+  "helpAnswerDataSecurity": "FileDirect 把用户的安全和隐私放在首位。您的数据仅在您的设备上进行处理和存储，不会上传到任何服务器。在传输过程中，所有数据都会使用行业标准的加密方法进行加密。FileDirect 是一个开源项目，欢迎所有人审查和参与。",
+  "helpQuestionLimits":"文件大小和带宽限制是多少？",
+  "helpAnswerLimits": "没有文件大小或带宽限制，因为数据直接在设备间端到端传输。"
 }
