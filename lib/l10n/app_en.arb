@@ -56,7 +56,15 @@
   "helpQuestionFileLocation":"Where are received files?",
   "helpAnswerFileLocation": "Received files are stored in the app folder on IOS and in the download folder on other platforms.",
   "helpQuestionDataSecurity":"Is my data secure?",
-  "helpAnswerDataSecurity": "FileDirect prioritizes the security and privacy of users. Your data is processed and stored locally on your devices without being uploaded to any servers. All data are encrypted using industry-standard methods during transmission. FileDirect is an open source project welcoming everyone to review and contribute.",
+  "helpAnswerDataSecurity": "{appName} prioritizes the security and privacy of users. Your data is processed and stored locally on your devices without being uploaded to any servers. All data are encrypted using industry-standard methods during transmission. {appName} is an open source project welcoming everyone to review and contribute.",
+  "@helpAnswerDataSecurity": {
+    "placeholders": {
+      "appName": {
+        "type": "String",
+        "example": "FileDirect"
+      }
+    }
+  },
   "helpQuestionLimits":"What are the file size and bandwidth limits?",
   "helpAnswerLimits": "There are no file size or bandwidth limits because data is streamed directly between peers."
 }

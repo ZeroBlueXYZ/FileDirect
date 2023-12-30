@@ -40,7 +40,7 @@
   "helpQuestionFileLocation":"接收到的文件在哪里？",
   "helpAnswerFileLocation": "在 IOS 上，接收到的文件存储在应用文件夹中；在其他平台上，则存储在下载文件夹中。",
   "helpQuestionDataSecurity":"我的数据安全吗？",
-  "helpAnswerDataSecurity": "FileDirect 把用户的安全和隐私放在首位。您的数据仅在您的设备上进行处理和存储，不会上传到任何服务器。在传输过程中，所有数据都会使用行业标准的加密方法进行加密。FileDirect 是一个开源项目，欢迎所有人审查和参与。",
+  "helpAnswerDataSecurity": "{appName} 把用户的安全和隐私放在首位。您的数据仅在您的设备上进行处理和存储，不会上传到任何服务器。在传输过程中，所有数据都会使用行业标准的加密方法进行加密。{appName} 是一个开源项目，欢迎所有人审查和参与。",
   "helpQuestionLimits":"文件大小和带宽限制是多少？",
   "helpAnswerLimits": "没有文件大小或带宽限制，因为数据直接在设备间端到端传输。"
 }

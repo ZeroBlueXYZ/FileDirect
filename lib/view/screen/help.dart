@@ -14,7 +14,8 @@ class HelpScreen extends StatelessWidget {
       ),
       (
         AppLocalizations.of(context)!.helpQuestionDataSecurity,
-        AppLocalizations.of(context)!.helpAnswerDataSecurity,
+        AppLocalizations.of(context)!
+            .helpAnswerDataSecurity(AppLocalizations.of(context)!.appName),
       ),
       (
         AppLocalizations.of(context)!.helpQuestionLimits,
@@ -30,10 +31,7 @@ class HelpScreen extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           child: ListView.separated(
             itemBuilder: (context, index) => ListTile(
-              title: Text(
-                qa[index].$1,
-                // style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+              title: Text(qa[index].$1),
               subtitle: Text(qa[index].$2),
             ),
             separatorBuilder: (context, index) => const Divider(
