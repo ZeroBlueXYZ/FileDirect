@@ -132,7 +132,7 @@ class _MessageScreenState extends State<MessageScreen> {
           maxLines: null,
           keyboardType: TextInputType.multiline,
           readOnly: widget.readOnly,
-          focusNode: widget.readOnly ? null : (FocusNode()..requestFocus()),
+          autofocus: true,
         ),
       ),
     );
@@ -152,6 +152,7 @@ class _MessageScreenState extends State<MessageScreen> {
           ),
           validator: (value) =>
               value != null && value.trim().isNotEmpty ? null : "",
+          autofocus: true,
         ),
       ),
       actions: [
