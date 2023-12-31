@@ -136,6 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _navigationItemIndex = value;
         });
       },
+      iconSize: 28,
     );
   }
 
