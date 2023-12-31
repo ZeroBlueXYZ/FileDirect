@@ -81,8 +81,14 @@ class _MessageScreenState extends State<MessageScreen> {
               ),
               IconButton(
                 onPressed: () async {
-                  await Clipboard.setData(
-                      ClipboardData(text: _messageTextEditingController.text));
+                  await Clipboard.setData(ClipboardData(
+                          text: _messageTextEditingController.text))
+                      .then((_) {
+                    if (!Platform.isAndroid) {
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(copiedToClipboardSnackBar(context));
+                    }
+                  });
                 },
                 icon: const Icon(Icons.copy),
                 tooltip: AppLocalizations.of(context)!.textCopy,
@@ -122,10 +128,11 @@ class _MessageScreenState extends State<MessageScreen> {
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
           ),
-          minLines: 8,
+          minLines: 10,
           maxLines: null,
           keyboardType: TextInputType.multiline,
           readOnly: widget.readOnly,
+          focusNode: widget.readOnly ? null : (FocusNode()..requestFocus()),
         ),
       ),
     );
