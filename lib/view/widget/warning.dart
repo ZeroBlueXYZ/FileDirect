@@ -54,6 +54,12 @@ SnackBar invalidCodeSnackBar(BuildContext context) {
   );
 }
 
+SnackBar timeoutErrorSnackBar(BuildContext context) {
+  return SnackBar(
+    content: Text(AppLocalizations.of(context)!.warningTimeoutError),
+  );
+}
+
 SnackBar copiedToClipboardSnackBar(BuildContext context) {
   return SnackBar(
     content: Text(AppLocalizations.of(context)!.warningCopiedToClipboard),

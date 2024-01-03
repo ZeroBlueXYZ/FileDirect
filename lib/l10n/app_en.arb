@@ -39,6 +39,7 @@
   "warningReceiveJobRunning": "The receive job is running. Please wait for the job to complete or stop it first.",
   "warningSendJobRunning": "The send job is running. Please wait for the job to complete or stop it first.",
   "warningInvalidCode": "Share code doesn't exist.",
+  "warningTimeoutError": "Connection timed out. Please check your internet connection and try again later.",
   "warningCopiedToClipboard": "Copied to clipboard.",
   "warningDeniedBySender": "Transfer request was denied by sender.",
   "warningCanceledByPeer": "Transfer was canceled by peer.",

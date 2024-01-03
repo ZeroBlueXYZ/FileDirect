@@ -31,6 +31,7 @@
   "warningReceiveJobRunning": "接收任务正在运行中。请等待任务完成或者取消任务。",
   "warningSendJobRunning": "发送任务正在运行中。请等待任务完成或者取消任务。",
   "warningInvalidCode": "分享码不存在。",
+  "warningTimeoutError": "连接超时。请检查您的网络连接，并稍后重试。",
   "warningCopiedToClipboard": "已复制到剪贴板。",
   "warningDeniedBySender": "发送方拒绝了传输请求。",
   "warningCanceledByPeer": "另一方取消了传输。",

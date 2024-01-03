@@ -162,6 +162,14 @@ class _SendScreenState extends State<SendScreen> {
           });
           state.sendState = JobState.waiting;
         }
+      }).onError((error, stackTrace) {
+        if (error is TimeoutException) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(timeoutErrorSnackBar(context));
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(unknownErrorSnackBar(context));
+        }
       });
     }
   }

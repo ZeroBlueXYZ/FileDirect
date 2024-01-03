@@ -73,7 +73,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     JobStateModel state,
     String code,
   ) async {
-    await getOutputDirectory().then((directory) {
+    await getOutputDirectory().then((directory) async {
       if (directory == null) {
         ScaffoldMessenger.of(context)
             .showSnackBar(unknownErrorSnackBar(context));
@@ -81,7 +81,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         _receiveChannel.outputDirectory = directory;
         _files.clear();
 
-        _packageRepo.get(code: code).then((package) async {
+        await _packageRepo.get(code: code).then((package) async {
           if (package == null) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(invalidCodeSnackBar(context));
@@ -137,6 +137,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             );
             await _receiveChannel.askToReceive(_name);
             state.receiveState = JobState.waiting;
+          }
+        }).onError((error, stackTrace) {
+          if (error is TimeoutException) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(timeoutErrorSnackBar(context));
+          } else {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(unknownErrorSnackBar(context));
           }
         });
       }
