@@ -12,6 +12,9 @@ class GlobalConfig {
   GlobalConfig._internal();
 
   static const AssetImage appIcon = AssetImage("assets/icon/icon.png");
+  static const AssetImage appIcon40x40 =
+      AssetImage("assets/icon/icon_40x40.png");
+
   final String multicastId = randomString(36);
   late final String serverUri;
   late final String appName;

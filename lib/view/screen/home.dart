@@ -71,6 +71,25 @@ class _HomeScreenState extends State<HomeScreen> {
           label: Text(AppLocalizations.of(context)!.textReceive),
         ),
       ],
+      leading: Container(
+        padding: const EdgeInsets.only(bottom: 5),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              width: 1,
+              color:
+                  Theme.of(context).colorScheme.surfaceVariant.withAlpha(255),
+            ),
+          ),
+        ),
+        child: IconButton(
+          onPressed: () => showDialog(
+            context: context,
+            builder: (context) => _aboutDialog(),
+          ),
+          icon: const Image(image: GlobalConfig.appIcon40x40),
+        ),
+      ),
       trailing: Expanded(
           child: Align(
         alignment: Alignment.bottomCenter,
@@ -79,7 +98,6 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _infoIconButton(),
               _helpIconButton(),
             ],
           ),
@@ -100,17 +118,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   AppBar _appBar() {
     return AppBar(
-      title: TextButton.icon(
-        onPressed: null,
-        icon: const Image(image: GlobalConfig.appIcon, width: 28),
-        label: Text(
-          AppLocalizations.of(context)!.appName,
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Image(image: GlobalConfig.appIcon, width: 30),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) => _aboutDialog(),
+            ),
+          ),
+          Text(
+            AppLocalizations.of(context)!.appName,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ],
       ),
-      centerTitle: false,
+      centerTitle: true,
       actions: [
-        _infoIconButton(),
         _helpIconButton(),
       ],
     );
@@ -136,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _navigationItemIndex = value;
         });
       },
-      iconSize: 28,
+      iconSize: 30,
     );
   }
 
@@ -153,28 +178,23 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  IconButton _infoIconButton() {
-    return IconButton(
-      icon: const Icon(Icons.info_outline),
-      onPressed: () => showDialog(
-        context: context,
-        builder: (context) => AboutDialog(
-          applicationName: AppLocalizations.of(context)!.appName,
-          applicationVersion: GlobalConfig().version,
-          applicationIcon: const Image(image: GlobalConfig.appIcon, width: 80),
-          applicationLegalese: GlobalConfig().copyright,
-          children: [
-            const Divider(height: 20, color: Colors.transparent),
-            Text(AppLocalizations.of(context)!.appDescription),
-          ],
-        ),
-      ),
+  AboutDialog _aboutDialog() {
+    return AboutDialog(
+      applicationName: AppLocalizations.of(context)!.appName,
+      applicationVersion: GlobalConfig().version,
+      applicationIcon: const Image(image: GlobalConfig.appIcon, width: 80),
+      applicationLegalese: GlobalConfig().copyright,
+      children: [
+        const Divider(height: 20, color: Colors.transparent),
+        Text(AppLocalizations.of(context)!.appDescription),
+      ],
     );
   }
 
   IconButton _helpIconButton() {
     return IconButton(
       icon: const Icon(Icons.help_outline),
+      // iconSize: 28,
       onPressed: () => Navigator.push(
         context,
         MaterialPageRoute(

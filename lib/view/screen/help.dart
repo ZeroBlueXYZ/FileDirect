@@ -22,9 +22,11 @@ class HelpScreen extends StatelessWidget {
         AppLocalizations.of(context)!.helpAnswerLimits,
       ),
     ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.helpTitle),
+        centerTitle: true,
       ),
       body: SafeArea(
         child: Padding(
