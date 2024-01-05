@@ -1,5 +1,6 @@
 import "dart:async";
 import "dart:convert";
+import "dart:io";
 import "dart:typed_data";
 
 import "package:flutter_webrtc/flutter_webrtc.dart";
@@ -273,7 +274,8 @@ abstract class PeerChannel {
   }) {
     return (RTCDataChannelMessage message) {
       if (message.isBinary) {
-        onDataChannelBinaryMessage?.call(message.binary);
+        final decompressed = Uint8List.fromList(zlib.decode(message.binary));
+        onDataChannelBinaryMessage?.call(decompressed);
       } else {
         onDataChannelTextMessage?.call(message.text);
       }
@@ -281,7 +283,8 @@ abstract class PeerChannel {
   }
 
   Future<void> sendBinaryData(Uint8List data) async {
-    await _dataChannel?.send(RTCDataChannelMessage.fromBinary(data));
+    final compressed = Uint8List.fromList(zlib.encode(data));
+    await _dataChannel?.send(RTCDataChannelMessage.fromBinary(compressed));
   }
 
   Future<void> sendTextData(String data) async {
