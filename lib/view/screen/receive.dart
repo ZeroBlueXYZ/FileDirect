@@ -306,23 +306,23 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             linearProgressIndicator: state.receiveState == JobState.running
                 ? LinearProgressIndicator(value: file.writeProgress)
                 : null,
-            trailing: file.info.type == FileInfoType.message &&
-                    file.writeProgress == 1.0
-                ? IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MessageScreen(
-                            readOnly: true,
-                            initialText: file.info.textData,
-                          ),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.navigate_next),
-                  )
-                : null,
+            trailing:
+                file.info.type == FileInfoType.message && file.isWriteComplete()
+                    ? IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MessageScreen(
+                                readOnly: true,
+                                initialText: file.info.textData,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.navigate_next),
+                      )
+                    : null,
             showPreview: file.isWriteComplete(),
           );
         },
