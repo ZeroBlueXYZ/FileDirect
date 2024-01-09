@@ -4,10 +4,9 @@ import 'package:flutter/material.dart';
 
 import 'package:anysend/model/file.dart';
 import 'package:anysend/util/file_helper.dart';
+import 'package:anysend/view/screen/image.dart';
 
-class FileCard extends StatelessWidget {
-  static const double leadingIconSize = 28;
-
+class FileCard extends StatefulWidget {
   final FileInfo fileInfo;
   final Widget? trailing;
   final LinearProgressIndicator? linearProgressIndicator;
@@ -22,6 +21,14 @@ class FileCard extends StatelessWidget {
   });
 
   @override
+  State<FileCard> createState() => _FileCardState();
+}
+
+class _FileCardState extends State<FileCard> {
+  static const double leadingIconSize = 28;
+  bool _errorLoadingImage = false;
+
+  @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 0.5,
@@ -29,21 +36,22 @@ class FileCard extends StatelessWidget {
         ListTile(
           leading: _leading(),
           title: Text(
-            fileInfo.name,
+            widget.fileInfo.name,
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
-          subtitle: Text(fileInfo.size.readableFileSize()),
-          trailing: trailing,
+          subtitle: Text(widget.fileInfo.size.readableFileSize()),
+          trailing: widget.trailing,
         ),
-        if (linearProgressIndicator != null) linearProgressIndicator!,
+        if (widget.linearProgressIndicator != null)
+          widget.linearProgressIndicator!,
       ]),
     );
   }
 
   Widget _leading() {
     final IconData iconData = () {
-      switch (fileInfo.type) {
+      switch (widget.fileInfo.type) {
         case FileInfoType.message:
           return Icons.message;
         case FileInfoType.image:
@@ -55,15 +63,34 @@ class FileCard extends StatelessWidget {
       }
     }();
     final Icon icon = Icon(iconData, size: leadingIconSize);
-
-    if (showPreview && fileInfo.type == FileInfoType.image) {
-      return Image.file(
-        File(fileInfo.path!),
-        errorBuilder: (context, error, stackTrace) => icon,
-        width: leadingIconSize,
-      );
-    } else {
-      return icon;
-    }
+    final bool previewImage =
+        widget.showPreview && widget.fileInfo.type == FileInfoType.image;
+    return IconButton(
+      icon: previewImage
+          ? Image.file(
+              File(widget.fileInfo.path!),
+              width: leadingIconSize,
+              errorBuilder: (context, error, stackTrace) {
+                WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                  setState(() {
+                    _errorLoadingImage = true;
+                  });
+                });
+                return icon;
+              },
+            )
+          : icon,
+      onPressed: previewImage && !_errorLoadingImage
+          ? () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ImageScreen(path: widget.fileInfo.path),
+                ),
+              );
+            }
+          : null,
+      disabledColor: Theme.of(context).colorScheme.onSurfaceVariant,
+    );
   }
 }
