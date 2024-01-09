@@ -86,7 +86,9 @@ class JobFile {
   }
 
   Future<void> closeWrite() async {
+    await _ioSink?.flush();
     await _ioSink?.close();
+    _ioSink = null;
   }
 
   void markReadComplete() {
