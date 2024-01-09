@@ -323,6 +323,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                     icon: const Icon(Icons.navigate_next),
                   )
                 : null,
+            showPreview: file.isWriteComplete(),
           );
         },
       ),

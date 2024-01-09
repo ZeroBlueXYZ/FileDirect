@@ -91,6 +91,10 @@ class JobFile {
     _ioSink = null;
   }
 
+  bool isWriteComplete() {
+    return _ioSink == null && _writeOffset == info.size;
+  }
+
   void markReadComplete() {
     readSizeInBytes = info.size;
   }
