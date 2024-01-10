@@ -5,7 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:anysend/model/auth_token.dart';
 import 'package:anysend/util/string_helper.dart';
 
-const String _copyright = 'Copyright © 2023 Zhaoming Zhang';
+const String _copyright = 'Copyright © 2023-2024 Zhaoming Zhang';
 
 class GlobalConfig {
   factory GlobalConfig() => _instance;
