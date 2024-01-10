@@ -30,7 +30,7 @@ class ServiceRetryPolicy extends RetryPolicy {
   ServiceRetryPolicy({required this.authServerUri});
 
   @override
-  int get maxRetryAttempts => 1;
+  int get maxRetryAttempts => 2;
 
   @override
   bool shouldAttemptRetryOnException(Exception reason) {
