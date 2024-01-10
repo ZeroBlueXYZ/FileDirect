@@ -14,8 +14,8 @@ class GlobalConfig {
 
   static const AssetImage appIcon = AssetImage("assets/icon/icon.png");
 
+  final String serverUri = "https://anysend-api.zeroblue.xyz";
   final String multicastId = randomString(36);
-  late final String serverUri;
   late final String appName;
   late final String packageName;
   late final String version;
@@ -24,17 +24,7 @@ class GlobalConfig {
   String get copyright => _copyright;
 
   Future<void> ensureInit() async {
-    initServerUri();
     await initPackageInfo();
-  }
-
-  void initServerUri() {
-    if (WidgetsBinding.instance.platformDispatcher.locale.countryCode == "CN" &&
-        DateTime.now().timeZoneOffset.inHours == 8) {
-      serverUri = "https://anysend-api-cn.zeroblue.xyz";
-    } else {
-      serverUri = "https://anysend-api.zeroblue.xyz";
-    }
   }
 
   Future<void> initPackageInfo() async {
