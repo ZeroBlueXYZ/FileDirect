@@ -42,7 +42,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icon/icon.png
-    - assets/icon/icon_40x40.png
 
 import_sorter:
   comments: false

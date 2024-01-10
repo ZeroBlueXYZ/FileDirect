@@ -4,10 +4,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'package:anysend/model/job_state.dart';
-import 'package:anysend/util/global_config.dart';
-import 'package:anysend/view/screen/help.dart';
 import 'package:anysend/view/screen/receive.dart';
 import 'package:anysend/view/screen/send.dart';
+import 'package:anysend/view/widget/menu_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -71,25 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
           label: Text(AppLocalizations.of(context)!.textReceive),
         ),
       ],
-      leading: Container(
-        padding: const EdgeInsets.only(bottom: 5),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              width: 1,
-              color:
-                  Theme.of(context).colorScheme.surfaceVariant.withAlpha(255),
-            ),
-          ),
-        ),
-        child: IconButton(
-          onPressed: () => showDialog(
-            context: context,
-            builder: (context) => _aboutDialog(),
-          ),
-          icon: const Image(image: GlobalConfig.appIcon40x40),
-        ),
-      ),
       trailing: Expanded(
           child: Align(
         alignment: Alignment.bottomCenter,
@@ -98,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _helpIconButton(),
+              _menuButton(),
             ],
           ),
         ),
@@ -118,25 +98,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   AppBar _appBar() {
     return AppBar(
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: const Image(image: GlobalConfig.appIcon, width: 30),
-            onPressed: () => showDialog(
-              context: context,
-              builder: (context) => _aboutDialog(),
-            ),
-          ),
-          Text(
-            AppLocalizations.of(context)!.appName,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-        ],
-      ),
+      title: Text(AppLocalizations.of(context)!.appName),
       centerTitle: true,
       actions: [
-        _helpIconButton(),
+        _menuButton(),
       ],
     );
   }
@@ -178,28 +143,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  AboutDialog _aboutDialog() {
-    return AboutDialog(
-      applicationName: AppLocalizations.of(context)!.appName,
-      applicationVersion: GlobalConfig().version,
-      applicationIcon: const Image(image: GlobalConfig.appIcon, width: 80),
-      applicationLegalese: GlobalConfig().copyright,
-      children: [
-        const Divider(height: 20, color: Colors.transparent),
-        Text(AppLocalizations.of(context)!.appDescription),
-      ],
-    );
-  }
-
-  IconButton _helpIconButton() {
+  IconButton _menuButton() {
     return IconButton(
-      icon: const Icon(Icons.help_outline),
-      // iconSize: 28,
-      onPressed: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HelpScreen(),
-        ),
+      icon: const Icon(Icons.menu),
+      onPressed: () => showDialog(
+        context: context,
+        builder: (context) => const MenuDialog(),
       ),
     );
   }
