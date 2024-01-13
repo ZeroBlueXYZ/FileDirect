@@ -96,7 +96,7 @@ abstract class PeerChannel {
     String message = "",
     String? peerId,
   }) {
-    _signalingRepository!.send(Signal(
+    _signalingRepository?.send(Signal(
       receiver: peerId ?? this.peerId ?? nullUuid,
       sender: nullUuid,
       type: type,

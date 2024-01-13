@@ -24,7 +24,7 @@
   "textExpiresIn": "到期",
   "textWaitForSenderToAccept": "等待发送方同意",
   "textEnterReceiveCodeFromSender": "输入6位数字分享码",
-  "textRequestForReceive": "请求接收数据",
+  "textConnection": "连接",
   "warningUnknownError": "出了未知问题。",
   "warningRestrictedNetworkError": "和另一方建立连接失败。请检查您的防火墙设置或使用不同的网络。",
   "warningInterruptedNetworkError": "和另一方的连接中断。",

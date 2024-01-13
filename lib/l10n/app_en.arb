@@ -24,7 +24,7 @@
   "textExpiresIn": "Expires in",
   "textWaitForSenderToAccept": "Waiting for sender to accept",
   "textEnterReceiveCodeFromSender": "Enter 6 digit share code",
-  "textRequestForReceive": "wants to receive data",
+  "textConnection": "Connection",
   "warningUnknownError": "Something went wrong.",
   "warningRestrictedNetworkError": "Failed to connect to peer. Check your firewall settings or use a different network.",
   "warningInterruptedNetworkError": "Peer connection was interrupted.",
