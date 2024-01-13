@@ -30,6 +30,7 @@ class Signal {
 
 class SignalTypes {
   static const String askToReceive = "ASK_TO_RECEIVE";
+  static const String cancelAskToReceive = "CANCEL_ASK_TO_RECEIVE";
   static const String accept = "ACCEPT";
   static const String deny = "DENY";
   static const String cancel = "CANCEL";

@@ -37,6 +37,7 @@ class SendChannel extends PeerChannel {
       : ((totalFileSize - sentFileSize) ~/ speedInBytes).readableDuration();
 
   void Function(String, String)? onAskToReceive;
+  void Function(String)? onCancelAskToReceive;
 
   @override
   Future<void> connect({
@@ -49,6 +50,7 @@ class SendChannel extends PeerChannel {
     void Function()? onDone,
     void Function()? onCancel,
     void Function(String, String)? onAskToReceive,
+    void Function(String)? onCancelAskToReceive,
   }) async {
     await super.connect(
       peerId: peerId,
@@ -61,17 +63,21 @@ class SendChannel extends PeerChannel {
       onCancel: onCancel,
     );
     this.onAskToReceive = onAskToReceive;
+    this.onCancelAskToReceive = onCancelAskToReceive;
   }
 
   @override
   Future<void> close() async {
     onAskToReceive = null;
+    onCancelAskToReceive = null;
     await super.close();
   }
 
   @override
   void handleSignal(Signal signal) {
-    if (signal.sender != peerId && signal.type != SignalTypes.askToReceive) {
+    if (!(signal.sender == peerId ||
+        signal.type == SignalTypes.askToReceive ||
+        signal.type == SignalTypes.cancelAskToReceive)) {
       return;
     }
 
@@ -83,6 +89,8 @@ class SendChannel extends PeerChannel {
         super.handleSignal(signal);
       case SignalTypes.askToReceive:
         onAskToReceive?.call(signal.sender, signal.message);
+      case SignalTypes.cancelAskToReceive:
+        onCancelAskToReceive?.call(signal.sender);
       default:
     }
   }

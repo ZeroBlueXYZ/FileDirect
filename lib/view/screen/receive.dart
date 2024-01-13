@@ -363,6 +363,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       ),
       trailingIcon: Icons.cancel,
       onTrailingIconPressed: () async {
+        await _receiveChannel.cancelAskToReceive();
         await _receiveChannel.close();
         await WakelockPlus.disable();
         state.receiveState = JobState.ready;

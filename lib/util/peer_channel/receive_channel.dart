@@ -118,6 +118,12 @@ class ReceiveChannel extends PeerChannel {
     );
   }
 
+  Future<void> cancelAskToReceive() async {
+    sendSignal(type: SignalTypes.cancelAskToReceive);
+    await closeDataChannel();
+    await closeRtcPeerConnection();
+  }
+
   Future<void> _onDataChannelOpen() async {
     await _sendListFiles(0);
   }

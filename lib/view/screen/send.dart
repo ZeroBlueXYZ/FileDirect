@@ -38,6 +38,7 @@ class _SendScreenState extends State<SendScreen> {
 
   List<JobFile> get _files => _sendChannel.files;
 
+  bool _toAcceptOrDeny = false;
   Package? _package;
   Timer? _announceTimer;
   Timer? _progressTimer;
@@ -114,47 +115,46 @@ class _SendScreenState extends State<SendScreen> {
               .showSnackBar(unknownErrorSnackBar(context));
         } else {
           await WakelockPlus.enable();
-          await _sendChannel.connect(
-            onFailure: (wasConnected) async {
-              ScaffoldMessenger.of(context).showSnackBar(wasConnected
-                  ? interruptedNetworkErrorSnackBar(context, onPressed: () {})
-                  : restrictedNetworkErrorSnackBar(context, onPressed: () {}));
-              await _sendChannel.close();
-              await WakelockPlus.disable();
-              _progressTimer?.cancel();
-              state.sendState = JobState.ready;
-            },
-            onDone: () async {
-              await _sendChannel.close();
-              await WakelockPlus.disable();
-              _progressTimer?.cancel();
-              state.sendState = JobState.done;
-            },
-            onCancel: () async {
-              ScaffoldMessenger.of(context).showSnackBar(canceledByPeerSnackBar(
-                context,
-                onPressed: () {},
-              ));
-              await _sendChannel.close();
-              await WakelockPlus.disable();
-              _progressTimer?.cancel();
-              state.sendState = JobState.ready;
-            },
-            onAskToReceive: (peerId, name) async {
-              if (_sendChannel.peerId != null) {
-                await _sendChannel.replyToReceive(peerId, false);
-              } else {
-                showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (context) => ChangeNotifierProvider.value(
-                    value: state,
-                    child: _acceptOrDenyDialog(peerId, name),
-                  ),
-                );
-              }
-            },
-          );
+          await _sendChannel.connect(onFailure: (wasConnected) async {
+            ScaffoldMessenger.of(context).showSnackBar(wasConnected
+                ? interruptedNetworkErrorSnackBar(context, onPressed: () {})
+                : restrictedNetworkErrorSnackBar(context, onPressed: () {}));
+            await _sendChannel.close();
+            await WakelockPlus.disable();
+            _progressTimer?.cancel();
+            state.sendState = JobState.ready;
+          }, onDone: () async {
+            await _sendChannel.close();
+            await WakelockPlus.disable();
+            _progressTimer?.cancel();
+            state.sendState = JobState.done;
+          }, onCancel: () async {
+            ScaffoldMessenger.of(context).showSnackBar(canceledByPeerSnackBar(
+              context,
+              onPressed: () {},
+            ));
+            await _sendChannel.close();
+            await WakelockPlus.disable();
+            _progressTimer?.cancel();
+            state.sendState = JobState.ready;
+          }, onAskToReceive: (peerId, name) async {
+            if (_sendChannel.peerId != null) {
+              await _sendChannel.replyToReceive(peerId, false);
+            } else {
+              showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (context) => ChangeNotifierProvider.value(
+                  value: state,
+                  child: _acceptOrDenyDialog(peerId, name),
+                ),
+              );
+            }
+          }, onCancelAskToReceive: (peerId) async {
+            if (_toAcceptOrDeny) {
+              Navigator.pop(context);
+            }
+          });
           final code = _package!.code;
           final expireTime = _package!.expireTime;
           _announceTimer = Timer.periodic(announcePeriod, (timer) {
@@ -460,6 +460,7 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   Widget _acceptOrDenyDialog(String peerId, String name) {
+    _toAcceptOrDeny = true;
     return Consumer<JobStateModel>(
       builder: (context, state, child) => AlertDialog(
         title: Text(
@@ -474,6 +475,7 @@ class _SendScreenState extends State<SendScreen> {
               }).onError((error, stackTrace) {
                 Navigator.pop(context);
               });
+              _toAcceptOrDeny = false;
             },
             child: Text(
               AppLocalizations.of(context)!.textDeny,
@@ -494,6 +496,7 @@ class _SendScreenState extends State<SendScreen> {
                     .showSnackBar(unknownErrorSnackBar(context));
                 Navigator.pop(context);
               });
+              _toAcceptOrDeny = false;
             },
             child: Text(
               AppLocalizations.of(context)!.textAccept,
