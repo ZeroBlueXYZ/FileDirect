@@ -66,6 +66,7 @@ class PackageRepository extends BaseRepository {
       ownerId: GlobalConfig().multicastId,
       expireTime: expireTime,
       platform: PlatformType.platform,
+      ownerName: GlobalConfig().deviceName,
     );
     _sendSocket?.send(
       utf8.encode(jsonEncode(package.toJson())),

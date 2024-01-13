@@ -24,15 +24,7 @@
   "textExpiresIn": "Expires in",
   "textWaitForSenderToAccept": "Waiting for sender to accept",
   "textEnterReceiveCodeFromSender": "Enter 6 digit share code",
-  "textRequestForReceive": "{name}\nrequests to receive data",
-  "@textRequestForReceive": {
-    "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "#101"
-      }
-    }
-  },
+  "textRequestForReceive": "wants to receive data",
   "warningUnknownError": "Something went wrong.",
   "warningRestrictedNetworkError": "Failed to connect to peer. Check your firewall settings or use a different network.",
   "warningInterruptedNetworkError": "Peer connection was interrupted.",

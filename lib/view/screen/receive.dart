@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -13,6 +12,7 @@ import 'package:anysend/model/job_state.dart';
 import 'package:anysend/model/package.dart';
 import 'package:anysend/repository/package.dart';
 import 'package:anysend/util/file_helper.dart';
+import 'package:anysend/util/global_config.dart';
 import 'package:anysend/util/output_path_helper.dart';
 import 'package:anysend/util/peer_channel/receive_channel.dart';
 import 'package:anysend/view/screen/message.dart';
@@ -35,7 +35,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   final PackageRepository _packageRepo = PackageRepository();
   final ReceiveChannel _receiveChannel = ReceiveChannel();
-  final String _name = "#${Random().nextInt(999).toString().padLeft(3, "0")}";
 
   final HashMap<NearbyPackage, DateTime> _nearbyPackages = HashMap();
 
@@ -135,7 +134,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                 }
               },
             );
-            await _receiveChannel.askToReceive(_name);
+            await _receiveChannel.askToReceive(
+                "${GlobalConfig().deviceName} (${GlobalConfig().receiverId})");
             state.receiveState = JobState.waiting;
           }
         }).onError((error, stackTrace) {
@@ -356,7 +356,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   Widget _waitingStateActionCard(JobStateModel state) {
     return ActionCard(
-      title: Text(_name, textAlign: TextAlign.center),
+      title: Text(GlobalConfig().receiverId, textAlign: TextAlign.center),
       subtitle: Text(
         AppLocalizations.of(context)!.textWaitForSenderToAccept,
         textAlign: TextAlign.center,

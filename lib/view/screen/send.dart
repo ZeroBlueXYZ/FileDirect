@@ -463,7 +463,7 @@ class _SendScreenState extends State<SendScreen> {
     return Consumer<JobStateModel>(
       builder: (context, state, child) => AlertDialog(
         title: Text(
-          AppLocalizations.of(context)!.textRequestForReceive(name),
+          "$name\n${AppLocalizations.of(context)!.textRequestForReceive}",
           textAlign: TextAlign.center,
         ),
         actions: [

@@ -43,11 +43,14 @@ class NearbyPackage {
   @JsonKey(required: true)
   final String platform;
 
+  final String? ownerName;
+
   NearbyPackage({
     required this.code,
     required this.ownerId,
     required this.expireTime,
     required this.platform,
+    required this.ownerName,
   });
 
   factory NearbyPackage.fromJson(Map<String, dynamic> json) =>

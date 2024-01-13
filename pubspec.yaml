@@ -10,6 +10,7 @@ dependencies:
   async: ^2.11.0
   collection: ^1.17.2
   cupertino_icons: ^1.0.2
+  device_info_plus: ^9.1.1
   file_picker: ^5.5.0
   flutter:
     sdk: flutter

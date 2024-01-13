@@ -36,6 +36,7 @@ NearbyPackage _$NearbyPackageFromJson(Map<String, dynamic> json) {
     ownerId: json['owner_id'] as String,
     expireTime: DateTime.parse(json['expire_time'] as String),
     platform: json['platform'] as String,
+    ownerName: json['owner_name'] as String?,
   );
 }
 
@@ -45,4 +46,5 @@ Map<String, dynamic> _$NearbyPackageToJson(NearbyPackage instance) =>
       'owner_id': instance.ownerId,
       'expire_time': instance.expireTime.toIso8601String(),
       'platform': instance.platform,
+      'owner_name': instance.ownerName,
     };

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
-
 import 'package:anysend/model/package.dart';
 import 'package:anysend/model/platform_type.dart';
 
@@ -27,19 +24,9 @@ class NearbyCard extends StatelessWidget {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.titleLarge,
         ),
-        subtitle: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "${AppLocalizations.of(context)!.textExpiresIn} ",
-            ),
-            TimerCountdown(
-              endTime: package.expireTime,
-              format: CountDownTimerFormat.minutesSeconds,
-              enableDescriptions: false,
-              spacerWidth: 2,
-            ),
-          ],
+        subtitle: Text(
+          package.ownerName ?? "",
+          textAlign: TextAlign.center,
         ),
         onTap: onTap,
       ),
